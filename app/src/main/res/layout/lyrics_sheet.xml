@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:id="@+id/content"
+    android:background="@color/colorPrimaryDark"
+    android:layout_height="match_parent">
+
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:indeterminateOnly="true"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:id="@+id/progressbar"
+        android:layout_height="8dp" />
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:textStyle="bold"
+        android:id="@+id/title"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
+        android:padding="4dp"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="wrap_content" />
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:id="@+id/refresh"
+        android:layout_gravity="bottom|center_horizontal"
+        android:src="@drawable/refresh"
+        android:visibility="gone"
+        android:layout_margin="24dp"
+        android:layout_height="wrap_content" />
+
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_margin="16dp"
+        android:id="@+id/lyricsScrollView"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:id="@+id/lyrics"
+            android:textSize="16sp"
+            android:gravity="center_horizontal"
+            android:lineSpacingMultiplier="1.6"
+            android:visibility="invisible"
+            android:text="@string/lyrics"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="2dp"
+            android:paddingBottom="16dp"
+            android:layout_height="wrap_content" />
+
+    </android.support.v4.widget.NestedScrollView>
+
+
+
+</LinearLayout>

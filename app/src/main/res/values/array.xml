@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <string-array name="triggerPos">
+        <item>Left</item>
+        <item>Right</item>
+    </string-array>
+
+    <string-array name="triggerPosValues">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+
+    <string-array name="triggerSwipeDirection">
+        <item>Up</item>
+        <item>Down</item>
+        <item>Left</item>
+        <item>Right</item>
+    </string-array>
+
+    <string-array name="triggerSwipeDirectionValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+
+</resources>
