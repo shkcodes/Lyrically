@@ -20,7 +20,6 @@
             </intent-filter>
         </activity>
 
-        <!--android:theme="@style/TransparentActivity"-->
 
 
         <receiver
@@ -28,13 +27,7 @@
             android:name=".MusicReceiver"
             android:exported="true">
             <intent-filter>
-                <!--<action android:name="com.android.music.metachanged" />-->
-
-                <!--<action android:name="com.spotify.music.metadatachanged"/>-->
-
                 <action android:name="com.android.music.playstatechanged" />
-                <!--<action android:name="com.android.music.playbackcomplete" />-->
-                <!--<action android:name="com.android.music.queuechanged" />-->
                 <action android:name="com.spotify.music.playbackstatechanged"/>
 
             </intent-filter>
