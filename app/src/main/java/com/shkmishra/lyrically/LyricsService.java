@@ -20,7 +20,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.NotificationCompat;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,7 +48,7 @@ public class LyricsService extends Service {
     String title,lyrics;
 
     String track = "",artist = "",artistU,trackU;
-    TextView titletv,lyricstv;
+    TextView titleTV, lyricsTV;
     NestedScrollView scrollView;
     ImageView refresh;
     ProgressBar progressBar;
@@ -60,7 +59,7 @@ public class LyricsService extends Service {
 
     private WindowManager windowManager;
 
-    WindowManager.LayoutParams params,layoutParams;
+    WindowManager.LayoutParams triggerParams, lyricsPanelParams;
 
     DisplayMetrics displayMetrics;
 
@@ -84,7 +83,7 @@ public class LyricsService extends Service {
         int width = (sharedPreferences.getInt("triggerWidth",10))*2;
         int height = (sharedPreferences.getInt("triggerHeight",10))*2;
 
-        params = new WindowManager.LayoutParams(
+        triggerParams = new WindowManager.LayoutParams(
                 width,height,
 
                 WindowManager.LayoutParams.TYPE_PHONE,
@@ -97,7 +96,7 @@ public class LyricsService extends Service {
 
         int panelHeight =  (sharedPreferences.getInt("panelHeight",60))*displayMetrics.heightPixels/100;
 
-        layoutParams = new WindowManager.LayoutParams(
+        lyricsPanelParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 panelHeight,
 
@@ -109,21 +108,20 @@ public class LyricsService extends Service {
                 PixelFormat.TRANSLUCENT);
 
 
-        layoutParams.gravity = Gravity.BOTTOM;
-        layoutParams.x = 0;
-        layoutParams.y  = 0;
+        lyricsPanelParams.gravity = Gravity.BOTTOM;
+        lyricsPanelParams.x = 0;
+        lyricsPanelParams.y  = 0;
 
 
         int triggerPosition = Integer.parseInt(sharedPreferences.getString("triggerPos","1"));
-        switch (triggerPosition){
-            case 1 :  params.gravity = Gravity.TOP | Gravity.START; break;
-            case 2 :  params.gravity = Gravity.TOP | Gravity.END; break;
-        }
-        params.x = 0;
-
-
         double offset = (double)(sharedPreferences.getInt("triggerOffset",10))/100;
-        params.y =(int)( displayMetrics.heightPixels - (displayMetrics.heightPixels*offset));
+
+        switch (triggerPosition){
+            case 1 :  triggerParams.gravity = Gravity.TOP | Gravity.START; break;
+            case 2 :  triggerParams.gravity = Gravity.TOP | Gravity.END; break;
+        }
+        triggerParams.x = 0;
+        triggerParams.y =(int)( displayMetrics.heightPixels - (displayMetrics.heightPixels*offset));
 
 
 
@@ -140,10 +138,10 @@ public class LyricsService extends Service {
 
 
         scrollView = (NestedScrollView) bottomLayout.findViewById(R.id.lyricsScrollView);
-        titletv = (TextView)bottomLayout.findViewById(R.id.title);
-        lyricstv = (TextView)bottomLayout.findViewById(R.id.lyrics);
+        titleTV = (TextView)bottomLayout.findViewById(R.id.title);
+        lyricsTV = (TextView)bottomLayout.findViewById(R.id.lyrics);
         Typeface face= Typeface.createFromAsset(getAssets(), "fonts/BonvenoCF-Light.otf");
-        lyricstv.setTypeface(face);
+        lyricsTV.setTypeface(face);
         progressBar = (ProgressBar) bottomLayout.findViewById(R.id.progressbar);
         refresh = (ImageView) bottomLayout.findViewById(R.id.refresh);
 
@@ -165,8 +163,6 @@ public class LyricsService extends Service {
 
 
 
-
-
         final int swipeDirection = Integer.parseInt(sharedPreferences.getString("swipeDirection","1"));
         trigger.setOnTouchListener(new OnSwipeTouchListener(this)
                                 {
@@ -175,7 +171,7 @@ public class LyricsService extends Service {
                                         super.onSwipeUp();
                                         if(swipeDirection==1) {
                                             vibrate();
-                                            windowManager.addView(container, layoutParams);
+                                            windowManager.addView(container, lyricsPanelParams);
                                             container.addView(bottomLayout);
                                             Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
                                             bottomLayout.startAnimation(animation);
@@ -187,7 +183,7 @@ public class LyricsService extends Service {
                                         super.onSwipeRight();
                                         if(swipeDirection==4) {
                                             vibrate();
-                                            windowManager.addView(container, layoutParams);
+                                            windowManager.addView(container, lyricsPanelParams);
                                             container.addView(bottomLayout);
                                             Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
                                             bottomLayout.startAnimation(animation);
@@ -199,7 +195,7 @@ public class LyricsService extends Service {
                                         super.onSwipeLeft();
                                         if (swipeDirection==3){
                                             vibrate();
-                                            windowManager.addView(container,layoutParams);
+                                            windowManager.addView(container, lyricsPanelParams);
                                             container.addView(bottomLayout);
                                             Animation animation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.slide_up);
                                             bottomLayout.startAnimation(animation);
@@ -211,7 +207,7 @@ public class LyricsService extends Service {
                                         super.onSwipeDown();
                                         if (swipeDirection==2) {
                                             vibrate();
-                                            windowManager.addView(container, layoutParams);
+                                            windowManager.addView(container, lyricsPanelParams);
                                             container.addView(bottomLayout);
                                             Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
                                             bottomLayout.startAnimation(animation);
@@ -222,7 +218,7 @@ public class LyricsService extends Service {
 
 
 
-        windowManager.addView(trigger, params);
+        windowManager.addView(trigger, triggerParams);
 
 
 
@@ -250,8 +246,6 @@ public class LyricsService extends Service {
         iF.addAction("com.android.music.metachanged");
         iF.addAction("com.android.music.playstatechanged");
         registerReceiver(musicReceiver, iF);
-
-
 
 
 
@@ -398,10 +392,10 @@ public class LyricsService extends Service {
         @Override
         protected void onPostExecute(Object o) {
             if(!found || !(lyrics.length()>0)) {
-                lyricstv.setText(getResources().getString(R.string.lyrics));
-                lyricstv.setVisibility(View.INVISIBLE);
+                lyricsTV.setText(getResources().getString(R.string.lyrics));
+                lyricsTV.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.GONE);
-                titletv.setText("No lyrics found");
+                titleTV.setText("No lyrics found");
                 refresh.setVisibility(View.VISIBLE);
                 refresh.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -423,10 +417,10 @@ public class LyricsService extends Service {
              refresh.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
             scrollView.fullScroll(ScrollView.FOCUS_UP);
-            titletv.setText(title);
-            lyricstv.setText(lyrics);
-            if(lyricstv.getVisibility()!=View.VISIBLE)
-            lyricstv.setVisibility(View.VISIBLE);
+            titleTV.setText(title);
+            lyricsTV.setText(lyrics);
+            if(lyricsTV.getVisibility()!=View.VISIBLE)
+            lyricsTV.setVisibility(View.VISIBLE);
 
 
             super.onPostExecute(o);

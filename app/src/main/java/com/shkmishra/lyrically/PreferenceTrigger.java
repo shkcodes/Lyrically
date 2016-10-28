@@ -28,7 +28,7 @@ public class PreferenceTrigger extends Service {
 
     private WindowManager windowManager;
 
-    WindowManager.LayoutParams params,layoutParams;
+    WindowManager.LayoutParams triggerParams, lyricsPanelParams;
 
     DisplayMetrics displayMetrics;
 
@@ -53,7 +53,7 @@ public class PreferenceTrigger extends Service {
         int height = (sharedPreferences.getInt("triggerHeight",10))*2;
 
 
-        params = new WindowManager.LayoutParams(
+        triggerParams = new WindowManager.LayoutParams(
                 width,height,
 
                 WindowManager.LayoutParams.TYPE_PHONE,
@@ -65,7 +65,7 @@ public class PreferenceTrigger extends Service {
         int panelHeight =  (sharedPreferences.getInt("panelHeight",60))*displayMetrics.heightPixels/100;
 
 
-        layoutParams = new WindowManager.LayoutParams(
+        lyricsPanelParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 panelHeight,
 
@@ -77,21 +77,20 @@ public class PreferenceTrigger extends Service {
                 PixelFormat.TRANSLUCENT);
 
 
-        layoutParams.gravity = Gravity.BOTTOM;
-        layoutParams.x = 0;
-        layoutParams.y = 0;
+        lyricsPanelParams.gravity = Gravity.BOTTOM;
+        lyricsPanelParams.x = 0;
+        lyricsPanelParams.y = 0;
 
 
         int triggerPosition = Integer.parseInt(sharedPreferences.getString("triggerPos","1"));
-        switch (triggerPosition){
-            case 1 :  params.gravity = Gravity.TOP | Gravity.START; break;
-            case 2 :  params.gravity = Gravity.TOP | Gravity.END; break;
-        }
-        params.x = 0;
-
-
         double offset = (double)(sharedPreferences.getInt("triggerOffset",10))/100;
-        params.y =(int)( displayMetrics.heightPixels - (displayMetrics.heightPixels*offset));
+
+        switch (triggerPosition){
+            case 1 :  triggerParams.gravity = Gravity.TOP | Gravity.START; break;
+            case 2 :  triggerParams.gravity = Gravity.TOP | Gravity.END; break;
+        }
+        triggerParams.x = 0;
+        triggerParams.y =(int)( displayMetrics.heightPixels - (displayMetrics.heightPixels*offset));
 
 
 
@@ -102,41 +101,8 @@ public class PreferenceTrigger extends Service {
 
 
         bottomLayout =  layoutInflater.inflate(R.layout.lyrics_sheet,null);
+
         bottomLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-
-        container = new LinearLayout(this)
-        {
-            @Override
-            public boolean dispatchKeyEvent(KeyEvent event) {
-                if(event.getKeyCode() == KeyEvent.KEYCODE_BACK || event.getKeyCode() == KeyEvent.KEYCODE_HOME){
-                    Animation animation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.slide_down);
-                    bottomLayout.startAnimation(animation);
-                    animation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            container.removeView(bottomLayout);
-                            windowManager.removeView(container);
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                    return true;
-                }
-
-                return super.dispatchKeyEvent(event);
-            }
-        };
-
-
         bottomLayout.setOnTouchListener(new SwipeDismissTouchListener(bottomLayout, null, new SwipeDismissTouchListener.DismissCallbacks() {
             @Override
             public boolean canDismiss(Object token) {
@@ -151,8 +117,7 @@ public class PreferenceTrigger extends Service {
             }
         }));
 
-
-
+        container = new LinearLayout(this);
 
 
         final int swipeDirection = Integer.parseInt(sharedPreferences.getString("swipeDirection","1"));
@@ -163,7 +128,7 @@ public class PreferenceTrigger extends Service {
                                            super.onSwipeUp();
                                            if(swipeDirection==1) {
                                                vibrate();
-                                               windowManager.addView(container, layoutParams);
+                                               windowManager.addView(container, lyricsPanelParams);
                                                container.addView(bottomLayout);
                                                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
                                                bottomLayout.startAnimation(animation);
@@ -175,7 +140,7 @@ public class PreferenceTrigger extends Service {
                                            super.onSwipeRight();
                                            if(swipeDirection==4) {
                                                vibrate();
-                                               windowManager.addView(container, layoutParams);
+                                               windowManager.addView(container, lyricsPanelParams);
                                                container.addView(bottomLayout);
                                                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
                                                bottomLayout.startAnimation(animation);
@@ -187,7 +152,7 @@ public class PreferenceTrigger extends Service {
                                            super.onSwipeLeft();
                                            if (swipeDirection==3){
                                                vibrate();
-                                               windowManager.addView(container,layoutParams);
+                                               windowManager.addView(container, lyricsPanelParams);
                                                container.addView(bottomLayout);
                                                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.slide_up);
                                                bottomLayout.startAnimation(animation);
@@ -199,7 +164,7 @@ public class PreferenceTrigger extends Service {
                                            super.onSwipeDown();
                                            if (swipeDirection==2) {
                                                vibrate();
-                                               windowManager.addView(container, layoutParams);
+                                               windowManager.addView(container, lyricsPanelParams);
                                                container.addView(bottomLayout);
                                                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
                                                bottomLayout.startAnimation(animation);
@@ -208,27 +173,31 @@ public class PreferenceTrigger extends Service {
                                    }
         );
 
-        windowManager.addView(trigger, params);
+        windowManager.addView(trigger, triggerParams);
 
-
+        
 
         sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if(key.equals("triggerOffset")) {
-                    double offset = (double)(sharedPreferences.getInt("triggerOffset",10))/100;
-                    params.y =(int)( displayMetrics.heightPixels - (displayMetrics.heightPixels*offset));
-                    windowManager.updateViewLayout(trigger,params);
-                }
-                else if (key.equals("triggerHeight")){
-                    params.height = (sharedPreferences.getInt("triggerHeight",10))*2;
-                    windowManager.updateViewLayout(trigger,params);
+                switch (key){
+                    case "triggerOffset" :
+                        double offset = (double)(sharedPreferences.getInt("triggerOffset",10))/100;
+                        triggerParams.y =(int)( displayMetrics.heightPixels - (displayMetrics.heightPixels*offset));
+                        windowManager.updateViewLayout(trigger, triggerParams);
+                        break;
+
+                    case "triggerHeight" :
+                        triggerParams.height = (sharedPreferences.getInt("triggerHeight",10))*2;
+                        windowManager.updateViewLayout(trigger, triggerParams);
+                        break;
+
+                    case "triggerWidth" :
+                        triggerParams.width = (sharedPreferences.getInt("triggerWidth",10))*2;
+                        windowManager.updateViewLayout(trigger, triggerParams);
+                        break;
                 }
 
-                else if (key.equals("triggerWidth")){
-                    params.width = (sharedPreferences.getInt("triggerWidth",10))*2;
-                    windowManager.updateViewLayout(trigger,params);
-                }
             }};
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);

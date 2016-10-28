@@ -70,9 +70,7 @@ public class SwipeDismissTouchListener implements View.OnTouchListener {
         mSlop = vc.getScaledTouchSlop();
         mMinFlingVelocity = vc.getScaledMinimumFlingVelocity() * 16;
         mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
-        mAnimationTime = 600;
-//        mAnimationTime = view.getContext().getResources().getInteger(
-//                android.R.integer.config_shortAnimTime);
+        mAnimationTime = view.getContext().getResources().getInteger(R.integer.animationDuration);
         mView = view;
         mToken = token;
         mCallbacks = callbacks;
@@ -84,6 +82,7 @@ public class SwipeDismissTouchListener implements View.OnTouchListener {
 
         if (mViewWidth < 2) {
             mViewWidth = mView.getWidth();
+            mViewHeight = mView.getHeight();
         }
 
         switch (motionEvent.getActionMasked()) {
@@ -128,6 +127,7 @@ public class SwipeDismissTouchListener implements View.OnTouchListener {
                     performDismiss();
                 } else if (mSwiping) {
                     // cancel
+
                     mView.animate()
                             .translationY(0)
 
