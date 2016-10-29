@@ -175,7 +175,7 @@ public class PreferenceTrigger extends Service {
 
         windowManager.addView(trigger, triggerParams);
 
-        
+
 
         sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override

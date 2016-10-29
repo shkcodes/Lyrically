@@ -27,7 +27,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -302,10 +301,10 @@ public class LyricsService extends Service {
             Bundle extras = intent.getExtras();
 
             boolean isPlaying = extras.getBoolean(extras.containsKey("playstate") ? "playstate" : "playing", true);
+            try {
 
             if(isPlaying && !((artist.equalsIgnoreCase(intent.getStringExtra("artist")) && (track.equalsIgnoreCase(intent.getStringExtra("track"))))))
             {
-                try {
                     progressBar.setVisibility(View.VISIBLE);
                     title = "";
                     lyrics = "";
@@ -315,10 +314,11 @@ public class LyricsService extends Service {
                     trackU = track.replaceAll(" ", "+");
                     new FetchLyrics().execute();
                 }
-                catch (NullPointerException e){
-
-                }
             }
+            catch (NullPointerException e){
+
+            }
+
 
         }
     } ;
@@ -342,22 +342,37 @@ public class LyricsService extends Service {
                 Document document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
                 Element results = document.select("h3.r > a").first();
 
-
                 lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"));
+                Element element;
+                String temp;
+                if(lyricURL.contains("genius")) {
 
+                    document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
+                    title = document.select("meta[property=og:title]").first().attr("content");
 
-                document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
-                title = document.select("meta[property=og:title]").first().attr("content");
+                    Elements selector = document.select("div.h2");
 
-                Elements selector = document.select("div.h2");
+                    for (Element e : selector) {
+                        e.remove();
+                    }
 
-                for (Element e: selector) {
-                    e.remove();
+                    element = document.select("div[class=song_body-lyrics]").first();
+                    temp = element.toString().substring(0,element.toString().indexOf("</lyrics>"));
                 }
+                else{
+                    url = "https://www.google.com/search?q=lyrics.wikia+"+artistU+"+"+trackU;
 
+                    document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
 
-                Element element  = document.select("div[class=song_body-lyrics]").first();
-                String temp = element.toString().substring(0,element.toString().indexOf("</lyrics>"));
+                    results = document.select("h3.r > a").first();
+                    lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"));
+                    document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
+                    title = document.select("meta[property=og:title]").first().attr("content");
+                    title = title.replace(":"," - ");
+
+                    element = document.select("div[class=lyricbox]").first();
+                    temp = element.toString();
+                }
 
                 temp = temp.replaceAll("(?i)<br[^>]*>", "br2n");
                 temp = temp.replaceAll("]","]shk");
@@ -368,6 +383,7 @@ public class LyricsService extends Service {
                 lyrics =   lyrics.replaceAll("br2n", "\n");
                 lyrics = lyrics.replaceAll("]shk","]\n");
                 lyrics = lyrics.replaceAll("shk\\[","\n [");
+                if(lyricURL.contains("genius"))
                 lyrics = lyrics.substring(lyrics.indexOf("Lyrics") + 6);
 
 
@@ -378,7 +394,6 @@ public class LyricsService extends Service {
             catch (NullPointerException e){
                 found = false;
             }
-
             return null;
         }
 
@@ -401,11 +416,7 @@ public class LyricsService extends Service {
                     @Override
                     public void onClick(View v) {
 
-
                         new FetchLyrics().execute();
-                        Animation scaleOut = new ScaleAnimation(1f, 0f, 1.0f, 0f,Animation.RELATIVE_TO_SELF, 0.5f,Animation.RELATIVE_TO_SELF, 0.5f);
-                        scaleOut.setDuration(300);
-                        scaleOut.setFillAfter(true);
                         progressBar.setVisibility(View.VISIBLE);
                     }
                 });
