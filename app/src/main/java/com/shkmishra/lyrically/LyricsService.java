@@ -20,6 +20,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.NotificationCompat;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +40,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLEncoder;
 
 public class LyricsService extends Service {
 
@@ -336,9 +340,11 @@ public class LyricsService extends Service {
         @Override
         protected Object doInBackground(Object[] params) {
 
-            url = "https://www.google.com/search?q=lyrics+genius+"+artistU+"+"+trackU;
 
             try {
+                url = "https://www.google.com/search?q="+URLEncoder.encode("lyrics+genius+"+artistU+"+"+trackU,"UTF-8");
+
+
                 Document document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
                 Element results = document.select("h3.r > a").first();
 
@@ -360,7 +366,9 @@ public class LyricsService extends Service {
                     temp = element.toString().substring(0,element.toString().indexOf("</lyrics>"));
                 }
                 else{
-                    url = "https://www.google.com/search?q=lyrics.wikia+"+artistU+"+"+trackU;
+
+                    url = "https://www.google.com/search?q="+ URLEncoder.encode("lyrics.wikia+"+trackU+"+"+artistU,"UTF-8");
+
 
                     document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
 
