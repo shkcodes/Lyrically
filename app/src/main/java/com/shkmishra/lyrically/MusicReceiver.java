@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 
 public class MusicReceiver extends BroadcastReceiver {
@@ -14,7 +13,7 @@ public class MusicReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
 
-        Bundle extras  = intent.getExtras();
+        Bundle extras = intent.getExtras();
         boolean isPlaying = extras.getBoolean(extras.containsKey("playstate") ? "playstate" : "playing", true);
 
 
@@ -27,17 +26,15 @@ public class MusicReceiver extends BroadcastReceiver {
             }
         }
 
-        if(isPlaying) {
+        if (isPlaying) {
             Intent intent1 = new Intent(context, LyricsService.class);
-            if(!isRunning)
-            context.startService(intent1);
-        }
-
-        else{
+            if (!isRunning)
+                context.startService(intent1);
+        } else {
             final NotificationManager mNotifyManager =
-                                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                        mNotifyManager.cancel(26181317);
-                        Intent intent1 = new Intent(context,LyricsService.class);
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotifyManager.cancel(26181317);
+            Intent intent1 = new Intent(context, LyricsService.class);
             context.stopService(intent1);
 
         }

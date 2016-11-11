@@ -12,6 +12,7 @@ import android.widget.TextView;
  * Created by Akhil on 22-10-2016.
  */
 public class SeekBarPreference2 extends Preference implements SeekBar.OnSeekBarChangeListener {
+    boolean mTrackingTouch;
     private SeekBar mSeekBar;
     private TextView mSeekBarValue;
     private int mProgress;
@@ -35,20 +36,17 @@ public class SeekBarPreference2 extends Preference implements SeekBar.OnSeekBarC
         mSeekBar = (SeekBar) view.findViewById(R.id.seekbar);
         mSeekBarValue = (TextView) view.findViewById(R.id.seekbarValue);
         mSeekBar.setProgress(mProgress);
-        mSeekBarValue.setText(mProgress+"");
+        mSeekBarValue.setText(mProgress + "");
         mSeekBar.setOnSeekBarChangeListener(this);
     }
-
 
     @Override
     public void onProgressChanged(
             SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser && !mTrackingTouch) {
             syncProgress(seekBar);
-        }
-        else mSeekBarValue.setText(progress+"");
+        } else mSeekBarValue.setText(progress + "");
     }
-    boolean mTrackingTouch;
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
@@ -69,7 +67,7 @@ public class SeekBarPreference2 extends Preference implements SeekBar.OnSeekBarC
         if (progress != mProgress) {
             mProgress = progress;
             persistInt(progress);
-            mSeekBarValue.setText(progress+"");
+            mSeekBarValue.setText(progress + "");
             if (notifyChanged) {
                 notifyChanged();
             }
@@ -102,7 +100,6 @@ public class SeekBarPreference2 extends Preference implements SeekBar.OnSeekBarC
             notifyChanged();
         }
     }
-
 
 
     @Override

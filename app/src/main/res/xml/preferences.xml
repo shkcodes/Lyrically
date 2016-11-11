@@ -3,42 +3,44 @@
 
     <PreferenceCategory
         android:title="Trigger Settings">
-    <ListPreference android:title="Trigger Position"
-        android:summary="The position of the area which detects the swipe"
-        android:key="triggerPos"
-        android:defaultValue="1"
+        <ListPreference
+            android:defaultValue="1"
         android:entries="@array/triggerPos"
-        android:entryValues="@array/triggerPosValues" />
+            android:entryValues="@array/triggerPosValues"
+            android:key="triggerPos"
+            android:summary="The position of the area which detects the swipe"
+            android:title="Trigger Position" />
 
         <com.shkmishra.lyrically.SeekBarPreference
-            android:key="triggerOffset"
             android:defaultValue="10"
+            android:key="triggerOffset"
             android:summary="Trigger Offset"/>
 
-        <ListPreference android:title="Swipe Direction"
-            android:summary="The direction in which you swipe to see the lyrics"
-            android:key="swipeDirection"
+        <ListPreference
             android:defaultValue="1"
             android:entries="@array/triggerSwipeDirection"
-            android:entryValues="@array/triggerSwipeDirectionValues" />
+            android:entryValues="@array/triggerSwipeDirectionValues"
+            android:key="swipeDirection"
+            android:summary="The direction in which you swipe to see the lyrics"
+            android:title="Swipe Direction" />
 
         <com.shkmishra.lyrically.SeekBarPreference
-            android:key="triggerWidth"
             android:defaultValue="75"
+            android:key="triggerWidth"
             android:summary="Trigger Width"/>
 
 
         <com.shkmishra.lyrically.SeekBarPreference
-            android:key="triggerHeight"
             android:defaultValue="75"
+            android:key="triggerHeight"
             android:summary="Trigger Height"/>
 
 
         <CheckBoxPreference
-            android:title="Vibration"
             android:defaultValue="true"
+            android:key="triggerVibration"
             android:summary="Enable or disable vibration on trigger detection"
-            android:key="triggerVibration"/>
+            android:title="Vibration" />
 
     </PreferenceCategory>
 
@@ -47,8 +49,8 @@
 
 
         <com.shkmishra.lyrically.SeekBarPreference2
-            android:key="panelHeight"
             android:defaultValue="60"
+            android:key="panelHeight"
             android:summary="Lyrics Panel Height"/>
 
 

@@ -9,9 +9,7 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,22 +23,15 @@ public class PreferenceTrigger extends Service {
     SharedPreferences sharedPreferences;
 
     SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener;
-
-    private WindowManager windowManager;
-
     WindowManager.LayoutParams triggerParams, lyricsPanelParams;
-
     DisplayMetrics displayMetrics;
-
-    View bottomLayout,trigger;
-
+    View bottomLayout, trigger;
     LinearLayout container;
-
     Vibrator vibrator;
+    private WindowManager windowManager;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
 
 
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -49,12 +40,12 @@ public class PreferenceTrigger extends Service {
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
 
-        int width = (sharedPreferences.getInt("triggerWidth",10))*2;
-        int height = (sharedPreferences.getInt("triggerHeight",10))*2;
+        int width = (sharedPreferences.getInt("triggerWidth", 10)) * 2;
+        int height = (sharedPreferences.getInt("triggerHeight", 10)) * 2;
 
 
         triggerParams = new WindowManager.LayoutParams(
-                width,height,
+                width, height,
 
                 WindowManager.LayoutParams.TYPE_PHONE,
 
@@ -62,7 +53,7 @@ public class PreferenceTrigger extends Service {
                 ,
                 PixelFormat.TRANSLUCENT);
 
-        int panelHeight =  (sharedPreferences.getInt("panelHeight",60))*displayMetrics.heightPixels/100;
+        int panelHeight = (sharedPreferences.getInt("panelHeight", 60)) * displayMetrics.heightPixels / 100;
 
 
         lyricsPanelParams = new WindowManager.LayoutParams(
@@ -82,16 +73,19 @@ public class PreferenceTrigger extends Service {
         lyricsPanelParams.y = 0;
 
 
-        int triggerPosition = Integer.parseInt(sharedPreferences.getString("triggerPos","1"));
-        double offset = (double)(sharedPreferences.getInt("triggerOffset",10))/100;
+        int triggerPosition = Integer.parseInt(sharedPreferences.getString("triggerPos", "1"));
+        double offset = (double) (sharedPreferences.getInt("triggerOffset", 10)) / 100;
 
-        switch (triggerPosition){
-            case 1 :  triggerParams.gravity = Gravity.TOP | Gravity.START; break;
-            case 2 :  triggerParams.gravity = Gravity.TOP | Gravity.END; break;
+        switch (triggerPosition) {
+            case 1:
+                triggerParams.gravity = Gravity.TOP | Gravity.START;
+                break;
+            case 2:
+                triggerParams.gravity = Gravity.TOP | Gravity.END;
+                break;
         }
         triggerParams.x = 0;
-        triggerParams.y =(int)( displayMetrics.heightPixels - (displayMetrics.heightPixels*offset));
-
+        triggerParams.y = (int) (displayMetrics.heightPixels - (displayMetrics.heightPixels * offset));
 
 
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -100,7 +94,7 @@ public class PreferenceTrigger extends Service {
         trigger.setBackgroundColor(getResources().getColor(R.color.colorAccent));
 
 
-        bottomLayout =  layoutInflater.inflate(R.layout.lyrics_sheet,null);
+        bottomLayout = layoutInflater.inflate(R.layout.lyrics_sheet, null);
 
         bottomLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         bottomLayout.setOnTouchListener(new SwipeDismissTouchListener(bottomLayout, null, new SwipeDismissTouchListener.DismissCallbacks() {
@@ -120,13 +114,12 @@ public class PreferenceTrigger extends Service {
         container = new LinearLayout(this);
 
 
-        final int swipeDirection = Integer.parseInt(sharedPreferences.getString("swipeDirection","1"));
-        trigger.setOnTouchListener(new OnSwipeTouchListener(this)
-                                   {
+        final int swipeDirection = Integer.parseInt(sharedPreferences.getString("swipeDirection", "1"));
+        trigger.setOnTouchListener(new OnSwipeTouchListener(this) {
                                        @Override
                                        public void onSwipeUp() {
                                            super.onSwipeUp();
-                                           if(swipeDirection==1) {
+                                           if (swipeDirection == 1) {
                                                vibrate();
                                                windowManager.addView(container, lyricsPanelParams);
                                                container.addView(bottomLayout);
@@ -138,7 +131,7 @@ public class PreferenceTrigger extends Service {
                                        @Override
                                        public void onSwipeRight() {
                                            super.onSwipeRight();
-                                           if(swipeDirection==4) {
+                                           if (swipeDirection == 4) {
                                                vibrate();
                                                windowManager.addView(container, lyricsPanelParams);
                                                container.addView(bottomLayout);
@@ -150,11 +143,11 @@ public class PreferenceTrigger extends Service {
                                        @Override
                                        public void onSwipeLeft() {
                                            super.onSwipeLeft();
-                                           if (swipeDirection==3){
+                                           if (swipeDirection == 3) {
                                                vibrate();
                                                windowManager.addView(container, lyricsPanelParams);
                                                container.addView(bottomLayout);
-                                               Animation animation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.slide_up);
+                                               Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
                                                bottomLayout.startAnimation(animation);
                                            }
                                        }
@@ -162,7 +155,7 @@ public class PreferenceTrigger extends Service {
                                        @Override
                                        public void onSwipeDown() {
                                            super.onSwipeDown();
-                                           if (swipeDirection==2) {
+                                           if (swipeDirection == 2) {
                                                vibrate();
                                                windowManager.addView(container, lyricsPanelParams);
                                                container.addView(bottomLayout);
@@ -176,32 +169,31 @@ public class PreferenceTrigger extends Service {
         windowManager.addView(trigger, triggerParams);
 
 
-
         sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                switch (key){
-                    case "triggerOffset" :
-                        double offset = (double)(sharedPreferences.getInt("triggerOffset",10))/100;
-                        triggerParams.y =(int)( displayMetrics.heightPixels - (displayMetrics.heightPixels*offset));
+                switch (key) {
+                    case "triggerOffset":
+                        double offset = (double) (sharedPreferences.getInt("triggerOffset", 10)) / 100;
+                        triggerParams.y = (int) (displayMetrics.heightPixels - (displayMetrics.heightPixels * offset));
                         windowManager.updateViewLayout(trigger, triggerParams);
                         break;
 
-                    case "triggerHeight" :
-                        triggerParams.height = (sharedPreferences.getInt("triggerHeight",10))*2;
+                    case "triggerHeight":
+                        triggerParams.height = (sharedPreferences.getInt("triggerHeight", 10)) * 2;
                         windowManager.updateViewLayout(trigger, triggerParams);
                         break;
 
-                    case "triggerWidth" :
-                        triggerParams.width = (sharedPreferences.getInt("triggerWidth",10))*2;
+                    case "triggerWidth":
+                        triggerParams.width = (sharedPreferences.getInt("triggerWidth", 10)) * 2;
                         windowManager.updateViewLayout(trigger, triggerParams);
                         break;
                 }
 
-            }};
+            }
+        };
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
-
 
 
         return super.onStartCommand(intent, flags, startId);
@@ -214,8 +206,8 @@ public class PreferenceTrigger extends Service {
     }
 
 
-    private void vibrate(){
-        boolean vibrate = sharedPreferences.getBoolean("triggerVibration",true);
+    private void vibrate() {
+        boolean vibrate = sharedPreferences.getBoolean("triggerVibration", true);
         if (vibrate) vibrator.vibrate(125);
     }
 
@@ -227,8 +219,7 @@ public class PreferenceTrigger extends Service {
         try {
             container.removeView(bottomLayout);
             windowManager.removeView(container);
-        }
-        catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
         windowManager.removeView(trigger);

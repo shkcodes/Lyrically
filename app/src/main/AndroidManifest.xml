@@ -2,9 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.shkmishra.lyrically">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -21,22 +21,19 @@
         </activity>
 
 
-
         <receiver
 
             android:name=".MusicReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.android.music.playstatechanged" />
-                <action android:name="com.spotify.music.playbackstatechanged"/>
+                <action android:name="com.spotify.music.playbackstatechanged" />
 
             </intent-filter>
         </receiver>
 
-        <service android:name=".LyricsService"/>
-        <service android:name=".PreferenceTrigger"/>
-
-
+        <service android:name=".LyricsService" />
+        <service android:name=".PreferenceTrigger" />
 
 
     </application>

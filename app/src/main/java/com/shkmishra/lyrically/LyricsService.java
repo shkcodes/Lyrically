@@ -13,6 +13,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
@@ -20,7 +21,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.NotificationCompat;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,17 +40,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.net.URLEncoder;
 
 public class LyricsService extends Service {
 
 
+    String title, lyrics;
 
-    String title,lyrics;
-
-    String track = "",artist = "",artistU,trackU;
+    String track = "", artist = "", artistU, trackU;
     TextView titleTV, lyricsTV;
     NestedScrollView scrollView;
     ImageView refresh;
@@ -58,23 +55,40 @@ public class LyricsService extends Service {
     int notifID = 26181317;
 
     SharedPreferences sharedPreferences;
-
-
-    private WindowManager windowManager;
-
     WindowManager.LayoutParams triggerParams, lyricsPanelParams;
-
     DisplayMetrics displayMetrics;
-
-    View bottomLayout,trigger;
-
+    View bottomLayout, trigger;
     LinearLayout container;
-
     Vibrator vibrator;
+    private WindowManager windowManager;
+    private BroadcastReceiver musicReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+
+            boolean isPlaying = extras.getBoolean(extras.containsKey("playstate") ? "playstate" : "playing", true);
+            try {
+
+                if (isPlaying && !((artist.equalsIgnoreCase(intent.getStringExtra("artist")) && (track.equalsIgnoreCase(intent.getStringExtra("track")))))) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    title = "";
+                    lyrics = "";
+                    artist = intent.getStringExtra("artist");
+                    track = intent.getStringExtra("track");
+                    artistU = artist.replaceAll(" ", "+");
+                    trackU = track.replaceAll(" ", "+");
+                    new FetchLyrics().execute();
+                }
+            } catch (NullPointerException e) {
+
+            }
+
+
+        }
+    };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
 
 
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -83,11 +97,11 @@ public class LyricsService extends Service {
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
 
-        int width = (sharedPreferences.getInt("triggerWidth",10))*2;
-        int height = (sharedPreferences.getInt("triggerHeight",10))*2;
+        int width = (sharedPreferences.getInt("triggerWidth", 10)) * 2;
+        int height = (sharedPreferences.getInt("triggerHeight", 10)) * 2;
 
         triggerParams = new WindowManager.LayoutParams(
-                width,height,
+                width, height,
 
                 WindowManager.LayoutParams.TYPE_PHONE,
 
@@ -97,7 +111,7 @@ public class LyricsService extends Service {
                 PixelFormat.TRANSLUCENT);
 
 
-        int panelHeight =  (sharedPreferences.getInt("panelHeight",60))*displayMetrics.heightPixels/100;
+        int panelHeight = (sharedPreferences.getInt("panelHeight", 60)) * displayMetrics.heightPixels / 100;
 
         lyricsPanelParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
@@ -113,37 +127,38 @@ public class LyricsService extends Service {
 
         lyricsPanelParams.gravity = Gravity.BOTTOM;
         lyricsPanelParams.x = 0;
-        lyricsPanelParams.y  = 0;
+        lyricsPanelParams.y = 0;
 
 
-        int triggerPosition = Integer.parseInt(sharedPreferences.getString("triggerPos","1"));
-        double offset = (double)(sharedPreferences.getInt("triggerOffset",10))/100;
+        int triggerPosition = Integer.parseInt(sharedPreferences.getString("triggerPos", "1"));
+        double offset = (double) (sharedPreferences.getInt("triggerOffset", 10)) / 100;
 
-        switch (triggerPosition){
-            case 1 :  triggerParams.gravity = Gravity.TOP | Gravity.START; break;
-            case 2 :  triggerParams.gravity = Gravity.TOP | Gravity.END; break;
+        switch (triggerPosition) {
+            case 1:
+                triggerParams.gravity = Gravity.TOP | Gravity.START;
+                break;
+            case 2:
+                triggerParams.gravity = Gravity.TOP | Gravity.END;
+                break;
         }
         triggerParams.x = 0;
-        triggerParams.y =(int)( displayMetrics.heightPixels - (displayMetrics.heightPixels*offset));
-
+        triggerParams.y = (int) (displayMetrics.heightPixels - (displayMetrics.heightPixels * offset));
 
 
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         trigger = new View(this);
 
 
-
-        bottomLayout =  layoutInflater.inflate(R.layout.lyrics_sheet,null);
+        bottomLayout = layoutInflater.inflate(R.layout.lyrics_sheet, null);
         bottomLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         container = new LinearLayout(this);
 
 
-
         scrollView = (NestedScrollView) bottomLayout.findViewById(R.id.lyricsScrollView);
-        titleTV = (TextView)bottomLayout.findViewById(R.id.title);
-        lyricsTV = (TextView)bottomLayout.findViewById(R.id.lyrics);
-        Typeface face= Typeface.createFromAsset(getAssets(), "fonts/BonvenoCF-Light.otf");
+        titleTV = (TextView) bottomLayout.findViewById(R.id.title);
+        lyricsTV = (TextView) bottomLayout.findViewById(R.id.lyrics);
+        Typeface face = Typeface.createFromAsset(getAssets(), "fonts/BonvenoCF-Light.otf");
         lyricsTV.setTypeface(face);
         progressBar = (ProgressBar) bottomLayout.findViewById(R.id.progressbar);
         refresh = (ImageView) bottomLayout.findViewById(R.id.refresh);
@@ -164,73 +179,81 @@ public class LyricsService extends Service {
         }));
 
 
+        final int swipeDirection = Integer.parseInt(sharedPreferences.getString("swipeDirection", "1"));
+        trigger.setOnTouchListener(new OnSwipeTouchListener(this) {
+                                       @Override
+                                       public void onSwipeUp() {
+                                           super.onSwipeUp();
+                                           if (swipeDirection == 1) {
+                                               vibrate();
+                                               windowManager.addView(container, lyricsPanelParams);
+                                               container.addView(bottomLayout);
+                                               Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+                                               bottomLayout.startAnimation(animation);
+                                           }
+                                       }
 
+                                       @Override
+                                       public void onSwipeRight() {
+                                           super.onSwipeRight();
+                                           if (swipeDirection == 4) {
+                                               vibrate();
+                                               windowManager.addView(container, lyricsPanelParams);
+                                               container.addView(bottomLayout);
+                                               Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+                                               bottomLayout.startAnimation(animation);
+                                           }
+                                       }
 
-        final int swipeDirection = Integer.parseInt(sharedPreferences.getString("swipeDirection","1"));
-        trigger.setOnTouchListener(new OnSwipeTouchListener(this)
-                                {
-                                    @Override
-                                    public void onSwipeUp() {
-                                        super.onSwipeUp();
-                                        if(swipeDirection==1) {
-                                            vibrate();
-                                            windowManager.addView(container, lyricsPanelParams);
-                                            container.addView(bottomLayout);
-                                            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
-                                            bottomLayout.startAnimation(animation);
-                                        }
-                                    }
+                                       @Override
+                                       public void onSwipeLeft() {
+                                           super.onSwipeLeft();
+                                           if (swipeDirection == 3) {
+                                               vibrate();
+                                               windowManager.addView(container, lyricsPanelParams);
+                                               container.addView(bottomLayout);
+                                               Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+                                               bottomLayout.startAnimation(animation);
+                                           }
+                                       }
 
-                                    @Override
-                                    public void onSwipeRight() {
-                                        super.onSwipeRight();
-                                        if(swipeDirection==4) {
-                                            vibrate();
-                                            windowManager.addView(container, lyricsPanelParams);
-                                            container.addView(bottomLayout);
-                                            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
-                                            bottomLayout.startAnimation(animation);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onSwipeLeft() {
-                                        super.onSwipeLeft();
-                                        if (swipeDirection==3){
-                                            vibrate();
-                                            windowManager.addView(container, lyricsPanelParams);
-                                            container.addView(bottomLayout);
-                                            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.slide_up);
-                                            bottomLayout.startAnimation(animation);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onSwipeDown() {
-                                        super.onSwipeDown();
-                                        if (swipeDirection==2) {
-                                            vibrate();
-                                            windowManager.addView(container, lyricsPanelParams);
-                                            container.addView(bottomLayout);
-                                            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
-                                            bottomLayout.startAnimation(animation);
-                                        }
-                                    }
-                                }
+                                       @Override
+                                       public void onSwipeDown() {
+                                           super.onSwipeDown();
+                                           if (swipeDirection == 2) {
+                                               vibrate();
+                                               windowManager.addView(container, lyricsPanelParams);
+                                               container.addView(bottomLayout);
+                                               Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+                                               bottomLayout.startAnimation(animation);
+                                           }
+                                       }
+                                   }
         );
 
+        final Handler handler = new Handler();
+        trigger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                windowManager.removeView(trigger);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        windowManager.addView(trigger, triggerParams);
+                    }
+                }, 5000);
+            }
+        });
 
 
         windowManager.addView(trigger, triggerParams);
 
 
-
-
         NotificationManager mNotifyManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationCompat.Builder mBuilder =  new NotificationCompat.Builder(this);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,1,new Intent(this,MainActivity.class),PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
         mBuilder.setContentTitle("Lyrically")
                 .setOngoing(true)
@@ -242,7 +265,6 @@ public class LyricsService extends Service {
                 mBuilder.build());
 
 
-
         IntentFilter iF = new IntentFilter();
         iF.addAction("com.spotify.music.metadatachanged");
         iF.addAction("com.spotify.music.playbackstatechanged");
@@ -251,15 +273,11 @@ public class LyricsService extends Service {
         registerReceiver(musicReceiver, iF);
 
 
-
-
         return Service.START_STICKY;
     }
 
-
-
-    private void vibrate(){
-        boolean vibrate = sharedPreferences.getBoolean("triggerVibration",true);
+    private void vibrate() {
+        boolean vibrate = sharedPreferences.getBoolean("triggerVibration", true);
         if (vibrate) vibrator.vibrate(125);
     }
 
@@ -269,12 +287,10 @@ public class LyricsService extends Service {
         return null;
     }
 
-
-
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.slide_down);
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
         bottomLayout.startAnimation(animation);
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -299,42 +315,11 @@ public class LyricsService extends Service {
 
     }
 
-    private BroadcastReceiver musicReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle extras = intent.getExtras();
-
-            boolean isPlaying = extras.getBoolean(extras.containsKey("playstate") ? "playstate" : "playing", true);
-            try {
-
-            if(isPlaying && !((artist.equalsIgnoreCase(intent.getStringExtra("artist")) && (track.equalsIgnoreCase(intent.getStringExtra("track"))))))
-            {
-                    progressBar.setVisibility(View.VISIBLE);
-                    title = "";
-                    lyrics = "";
-                    artist = intent.getStringExtra("artist");
-                    track = intent.getStringExtra("track");
-                    artistU = artist.replaceAll(" ", "+");
-                    trackU = track.replaceAll(" ", "+");
-                    new FetchLyrics().execute();
-                }
-            }
-            catch (NullPointerException e){
-
-            }
-
-
-        }
-    } ;
-
-
-
     class FetchLyrics extends AsyncTask {
 
         boolean found = true;
 
-        String url = "s",lyricURL = "s";
-
+        String url = "s", lyricURL = "s";
 
 
         @Override
@@ -342,7 +327,7 @@ public class LyricsService extends Service {
 
 
             try {
-                url = "https://www.google.com/search?q="+URLEncoder.encode("lyrics+genius+"+artistU+"+"+trackU,"UTF-8");
+                url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics+genius+" + artistU + "+" + trackU, "UTF-8");
 
 
                 Document document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
@@ -351,7 +336,7 @@ public class LyricsService extends Service {
                 lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"));
                 Element element;
                 String temp;
-                if(lyricURL.contains("genius")) {
+                if (lyricURL.contains("genius")) {
 
                     document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
                     title = document.select("meta[property=og:title]").first().attr("content");
@@ -363,11 +348,10 @@ public class LyricsService extends Service {
                     }
 
                     element = document.select("div[class=song_body-lyrics]").first();
-                    temp = element.toString().substring(0,element.toString().indexOf("</lyrics>"));
-                }
-                else{
+                    temp = element.toString().substring(0, element.toString().indexOf("</lyrics>"));
+                } else {
 
-                    url = "https://www.google.com/search?q="+ URLEncoder.encode("lyrics.wikia+"+trackU+"+"+artistU,"UTF-8");
+                    url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics.wikia+" + trackU + "+" + artistU, "UTF-8");
 
 
                     document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
@@ -376,30 +360,28 @@ public class LyricsService extends Service {
                     lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"));
                     document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
                     title = document.select("meta[property=og:title]").first().attr("content");
-                    title = title.replace(":"," - ");
+                    title = title.replace(":", " - ");
 
                     element = document.select("div[class=lyricbox]").first();
                     temp = element.toString();
                 }
 
                 temp = temp.replaceAll("(?i)<br[^>]*>", "br2n");
-                temp = temp.replaceAll("]","]shk");
-                temp = temp.replaceAll("\\[","shk[");
+                temp = temp.replaceAll("]", "]shk");
+                temp = temp.replaceAll("\\[", "shk[");
 
 
                 lyrics = Jsoup.parse(temp).text();
-                lyrics =   lyrics.replaceAll("br2n", "\n");
-                lyrics = lyrics.replaceAll("]shk","]\n");
-                lyrics = lyrics.replaceAll("shk\\[","\n [");
-                if(lyricURL.contains("genius"))
-                lyrics = lyrics.substring(lyrics.indexOf("Lyrics") + 6);
-
+                lyrics = lyrics.replaceAll("br2n", "\n");
+                lyrics = lyrics.replaceAll("]shk", "]\n");
+                lyrics = lyrics.replaceAll("shk\\[", "\n [");
+                if (lyricURL.contains("genius"))
+                    lyrics = lyrics.substring(lyrics.indexOf("Lyrics") + 6);
 
 
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-            catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 found = false;
             }
             return null;
@@ -414,7 +396,7 @@ public class LyricsService extends Service {
 
         @Override
         protected void onPostExecute(Object o) {
-            if(!found || !(lyrics.length()>0)) {
+            if (!found || !(lyrics.length() > 0)) {
                 lyricsTV.setText(getResources().getString(R.string.lyrics));
                 lyricsTV.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.GONE);
@@ -432,21 +414,18 @@ public class LyricsService extends Service {
             }
 
 
-
-             refresh.setVisibility(View.GONE);
+            refresh.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
             scrollView.fullScroll(ScrollView.FOCUS_UP);
             titleTV.setText(title);
             lyricsTV.setText(lyrics);
-            if(lyricsTV.getVisibility()!=View.VISIBLE)
-            lyricsTV.setVisibility(View.VISIBLE);
+            if (lyricsTV.getVisibility() != View.VISIBLE)
+                lyricsTV.setVisibility(View.VISIBLE);
 
 
             super.onPostExecute(o);
         }
     }
-
-
 
 
 }
