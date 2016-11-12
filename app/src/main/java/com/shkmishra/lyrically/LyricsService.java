@@ -290,27 +290,30 @@ public class LyricsService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
-        bottomLayout.startAnimation(animation);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+        try {
+            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
+            bottomLayout.startAnimation(animation);
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
 
-            }
+                }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                container.removeView(bottomLayout);
-                windowManager.removeView(container);
-            }
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    container.removeView(bottomLayout);
+                    windowManager.removeView(container);
+                }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+                @Override
+                public void onAnimationRepeat(Animation animation) {
 
-            }
-        });
-        windowManager.removeView(trigger);
-
+                }
+            });
+            windowManager.removeView(trigger);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
         unregisterReceiver(musicReceiver);
 
     }
