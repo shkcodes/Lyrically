@@ -17,6 +17,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class PreferenceTrigger extends Service {
 
@@ -95,6 +96,8 @@ public class PreferenceTrigger extends Service {
 
 
         bottomLayout = layoutInflater.inflate(R.layout.lyrics_sheet, null);
+        TextView titleTV = (TextView) bottomLayout.findViewById(R.id.title);
+        titleTV.setText("Your lyrics will appear here");
 
         bottomLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         bottomLayout.setOnTouchListener(new SwipeDismissTouchListener(bottomLayout, null, new SwipeDismissTouchListener.DismissCallbacks() {
