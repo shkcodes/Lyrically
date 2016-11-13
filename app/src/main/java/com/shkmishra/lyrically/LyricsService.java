@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -82,7 +83,6 @@ public class LyricsService extends Service {
             } catch (NullPointerException e) {
 
             }
-
 
         }
     };
@@ -161,6 +161,7 @@ public class LyricsService extends Service {
         Typeface face = Typeface.createFromAsset(getAssets(), "fonts/BonvenoCF-Light.otf");
         lyricsTV.setTypeface(face);
         progressBar = (ProgressBar) bottomLayout.findViewById(R.id.progressbar);
+        progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_IN);
         refresh = (ImageView) bottomLayout.findViewById(R.id.refresh);
 
 
