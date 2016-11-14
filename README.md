@@ -5,6 +5,8 @@ An everywhere lyrics app which can be used by simply swiping a part of your scre
 
     Music Players tested :
 
+-Google Play Music
+
 -Spotify
 
 -Phonograph
@@ -15,3 +17,9 @@ An everywhere lyrics app which can be used by simply swiping a part of your scre
 
 
 I have plans to make it work with many other music players in the future.
+
+
+
+How to use : https://www.youtube.com/watch?v=g0XidfCGZHU
+
+Download : https://github.com/shkcodes/Lyrically/releases
