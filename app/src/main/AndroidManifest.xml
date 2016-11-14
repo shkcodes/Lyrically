@@ -34,6 +34,7 @@
 
         <service android:name=".LyricsService" />
         <service android:name=".PreferenceTrigger" />
+        <service android:name=".ShowLyrics"/>
 
 
     </application>

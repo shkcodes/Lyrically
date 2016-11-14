@@ -1,5 +1,6 @@
 package com.shkmishra.lyrically;
 
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,12 +17,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.NotificationCompat;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,7 +86,7 @@ public class LyricsService extends Service {
                     new FetchLyrics().execute();
                 }
             } catch (NullPointerException e) {
-
+                e.printStackTrace();
             }
 
         }
@@ -158,8 +163,6 @@ public class LyricsService extends Service {
         scrollView = (NestedScrollView) bottomLayout.findViewById(R.id.lyricsScrollView);
         titleTV = (TextView) bottomLayout.findViewById(R.id.title);
         lyricsTV = (TextView) bottomLayout.findViewById(R.id.lyrics);
-        Typeface face = Typeface.createFromAsset(getAssets(), "fonts/BonvenoCF-Light.otf");
-        lyricsTV.setTypeface(face);
         progressBar = (ProgressBar) bottomLayout.findViewById(R.id.progressbar);
         progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_IN);
         refresh = (ImageView) bottomLayout.findViewById(R.id.refresh);
@@ -232,7 +235,16 @@ public class LyricsService extends Service {
                                    }
         );
 
-        final Handler handler = new Handler();
+        final Handler handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                windowManager.addView(container, lyricsPanelParams);
+                container.addView(bottomLayout);
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+                bottomLayout.startAnimation(animation);
+            }
+        };
         trigger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -254,7 +266,10 @@ public class LyricsService extends Service {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent showLyrics = new Intent(this, ShowLyrics.class);
+        showLyrics.putExtra("messenger",new Messenger(handler));
+        PendingIntent pendingIntent = PendingIntent.getService(this, 1, showLyrics, PendingIntent.FLAG_UPDATE_CURRENT);
+
 
         mBuilder.setContentTitle("Lyrically")
                 .setOngoing(true)
