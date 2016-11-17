@@ -1,115 +1,92 @@
 package com.shkmishra.lyrically;
 
-import android.app.NotificationManager;
-import android.content.Context;
+import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.media.AudioManager;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
-import android.provider.Settings;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-
+import android.support.v7.widget.CardView;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
-    boolean isMusicPlaying;
-    AudioManager audioManager;
+    CardView cardView1, cardView2, cardView3, cardView4;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setContentView(R.layout.activity_main);
         super.onCreate(savedInstanceState);
 
+        isStoragePermissionGranted();
+        cardView1 = (CardView) findViewById(R.id.card1);
+        cardView2 = (CardView) findViewById(R.id.card2);
+        cardView3 = (CardView) findViewById(R.id.card3);
+        cardView4 = (CardView) findViewById(R.id.card4);
 
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
-
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Intent intent = new Intent(this, PreferenceTrigger.class);
-        stopService(intent);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Intent intent = new Intent(this, PreferenceTrigger.class);
-        stopService(intent);
-        if (isMusicPlaying) {
-            Intent intent1 = new Intent(this, LyricsService.class);
-            startService(intent1);
-        }
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        isMusicPlaying = audioManager.isMusicActive();
-        checkDrawOverlayPermission();
-    }
-
-    public void checkDrawOverlayPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(this)) {
-                final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, 69);
-            } else {
-                Intent intent = new Intent(this, PreferenceTrigger.class);
-                startService(intent);
-
-                final NotificationManager mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotifyManager.cancel(26181317);
-                Intent intent1 = new Intent(this, LyricsService.class);
-                stopService(intent1);
+        cardView1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startService(new Intent(getApplicationContext(), DownloadService.class));
 
             }
-        } else {
-            Intent intent = new Intent(this, PreferenceTrigger.class);
-            startService(intent);
+        });
 
-            final NotificationManager mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotifyManager.cancel(26181317);
-            Intent intent1 = new Intent(this, LyricsService.class);
-            stopService(intent1);
+        cardView2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("https://www.youtube.com/watch?v=g0XidfCGZHU"));
+                startActivity(intent);
+            }
+        });
 
-        }
+        cardView3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("https://github.com/shkcodes/lyrically"));
+                startActivity(intent);
+            }
+        });
+
+        cardView4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.shkmishra.instadict"));
+                startActivity(intent);
+            }
+        });
+
     }
 
-    public static class MyPreferenceFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
-        @Override
-        public void onCreate(final Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_mainactivity, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menuSettings:
+                startActivity(new Intent(this, PreferenceActivity.class));
         }
+        return super.onOptionsItemSelected(item);
+    }
 
-        @Override
-        public void onResume() {
-            getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-            super.onResume();
-        }
-
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (!(key.equals("triggerOffset") || key.equals("triggerWidth") || key.equals("triggerHeight"))) {
-                Intent intent = new Intent(getActivity(), PreferenceTrigger.class);
-                getActivity().stopService(intent);
-                getActivity().startService(intent);
+    public void isStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
             }
-        }
-
-        @Override
-        public void onPause() {
-            getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-            super.onPause();
         }
     }
 }
