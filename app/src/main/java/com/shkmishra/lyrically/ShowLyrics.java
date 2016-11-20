@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.util.Log;
 
 public class ShowLyrics extends IntentService {
 
@@ -17,7 +16,6 @@ public class ShowLyrics extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.d("shk","cluck");
         Messenger messenger = (Messenger)  intent.getExtras().get("messenger");
         try {
             messenger.send(new Message());

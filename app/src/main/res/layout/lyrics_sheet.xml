@@ -46,13 +46,12 @@
         android:layout_margin="16dp">
         <TextView
             android:id="@+id/lyrics"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:gravity="center_horizontal"
             android:lineSpacingMultiplier="1.6"
             android:paddingBottom="16dp"
-            android:text="@string/lyrics"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:visibility="invisible" />

@@ -97,9 +97,9 @@ public class PreferenceTrigger extends Service {
 
         bottomLayout = layoutInflater.inflate(R.layout.lyrics_sheet, null);
         TextView titleTV = (TextView) bottomLayout.findViewById(R.id.title);
-        titleTV.setText("Your lyrics will appear here");
+        titleTV.setText(getResources().getString(R.string.lyrcisHint));
 
-        bottomLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        bottomLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         bottomLayout.setOnTouchListener(new SwipeDismissTouchListener(bottomLayout, null, new SwipeDismissTouchListener.DismissCallbacks() {
             @Override
             public boolean canDismiss(Object token) {

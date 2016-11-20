@@ -1,6 +1,5 @@
 package com.shkmishra.lyrically;
 
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,23 +9,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.RemoteException;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.NotificationCompat;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,13 +44,20 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 public class LyricsService extends Service {
 
 
     String title, lyrics;
+    boolean offlineMusic = false;
+    File[] lyricsFiles;
 
     String track = "", artist = "", artistU, trackU;
     TextView titleTV, lyricsTV;
@@ -59,6 +65,7 @@ public class LyricsService extends Service {
     ImageView refresh;
     ProgressBar progressBar;
     int notifID = 26181317;
+    ArrayList<Song> songArrayList = new ArrayList<>();
 
     SharedPreferences sharedPreferences;
     WindowManager.LayoutParams triggerParams, lyricsPanelParams;
@@ -72,18 +79,48 @@ public class LyricsService extends Service {
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
 
-            boolean isPlaying = extras.getBoolean(extras.containsKey("playstate") ? "playstate" : "playing", true);
+            boolean isPlaying = extras.getBoolean(extras.containsKey("playstate") ? "playstate" : "playing", false);
             try {
 
                 if (isPlaying && !((artist.equalsIgnoreCase(intent.getStringExtra("artist")) && (track.equalsIgnoreCase(intent.getStringExtra("track")))))) {
-                    progressBar.setVisibility(View.VISIBLE);
+
                     title = "";
                     lyrics = "";
+                    progressBar.setVisibility(View.VISIBLE);
+                    titleTV.setText("");
+                    lyricsTV.setText("");
+                    lyricsTV.setVisibility(View.INVISIBLE);
+                    refresh.setVisibility(View.GONE);
                     artist = intent.getStringExtra("artist");
                     track = intent.getStringExtra("track");
-                    artistU = artist.replaceAll(" ", "+");
-                    trackU = track.replaceAll(" ", "+");
-                    new FetchLyrics().execute();
+                    for (Song song : songArrayList) {
+                        if ((song.getArtist().equalsIgnoreCase(artist)) && (song.getTrack().equalsIgnoreCase(track))) {
+                            lyrics = getLyrics(song);
+                            if (!lyrics.equals("")) {
+                                title = artist + " - " + track;
+                                lyricsTV.setText(lyrics);
+                                lyricsTV.setVisibility(View.VISIBLE);
+                                scrollView.fullScroll(ScrollView.FOCUS_UP);
+                                refresh.setVisibility(View.GONE);
+                                titleTV.setText(title);
+                                progressBar.setVisibility(View.GONE);
+                            } else {
+                                lyricsTV.setText("");
+                                lyricsTV.setVisibility(View.INVISIBLE);
+                                artistU = artist.replaceAll(" ", "+");
+                                trackU = track.replaceAll(" ", "+");
+                                new FetchLyrics().execute();
+                                break;
+                            }
+                            offlineMusic = true;
+                        }
+                    }
+                    if (!offlineMusic) {
+                        artistU = artist.replaceAll(" ", "+");
+                        trackU = track.replaceAll(" ", "+");
+                        new FetchLyrics().execute();
+                    }
+
                 }
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -104,6 +141,11 @@ public class LyricsService extends Service {
 
         int width = (sharedPreferences.getInt("triggerWidth", 10)) * 2;
         int height = (sharedPreferences.getInt("triggerHeight", 10)) * 2;
+
+        getSongsList();
+        String path = Environment.getExternalStorageDirectory() + File.separator + "Lyrically/";
+        File directory = new File(path);
+        lyricsFiles = directory.listFiles();
 
         triggerParams = new WindowManager.LayoutParams(
                 width, height,
@@ -155,7 +197,7 @@ public class LyricsService extends Service {
 
 
         bottomLayout = layoutInflater.inflate(R.layout.lyrics_sheet, null);
-        bottomLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        bottomLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         container = new LinearLayout(this);
 
@@ -235,14 +277,18 @@ public class LyricsService extends Service {
                                    }
         );
 
-        final Handler handler = new Handler(){
+        final Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
-                windowManager.addView(container, lyricsPanelParams);
-                container.addView(bottomLayout);
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
-                bottomLayout.startAnimation(animation);
+                try {
+                    windowManager.addView(container, lyricsPanelParams);
+                    container.addView(bottomLayout);
+                    Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+                    bottomLayout.startAnimation(animation);
+                } catch (IllegalStateException e) {
+                    e.printStackTrace();
+                }
             }
         };
         trigger.setOnClickListener(new View.OnClickListener() {
@@ -267,7 +313,7 @@ public class LyricsService extends Service {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
 
         Intent showLyrics = new Intent(this, ShowLyrics.class);
-        showLyrics.putExtra("messenger",new Messenger(handler));
+        showLyrics.putExtra("messenger", new Messenger(handler));
         PendingIntent pendingIntent = PendingIntent.getService(this, 1, showLyrics, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
@@ -334,6 +380,80 @@ public class LyricsService extends Service {
 
     }
 
+
+    private void getSongsList() {
+
+
+        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+        String[] projection = {
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DURATION
+        };
+        Cursor cursor = getContentResolver().query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                null,
+                null);
+        while (cursor.moveToNext()) {
+            String artist = cursor.getString(1);
+            String title = cursor.getString(2);
+            long songID = Long.parseLong(cursor.getString(0));
+            long duration = Long.parseLong(cursor.getString(3));
+            if ((duration / 1000) > 40) {
+                songArrayList.add(new Song(title, artist, songID));
+            }
+        }
+        cursor.close();
+
+
+    }
+
+    private String getLyrics(Song song) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (File file : lyricsFiles) {
+            if (file.getName().equals(song.getId() + ".txt")) {
+
+                try {
+                    String line;
+                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+                    while ((line = bufferedReader.readLine()) != null) {
+                        stringBuilder.append(line);
+                        stringBuilder.append("\n");
+                    }
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return stringBuilder.toString();
+            }
+        }
+        return "";
+
+    }
+
+    private void saveLyricsOffline(String lyrics) {
+        for (Song song : songArrayList) {
+            if ((song.getArtist().equalsIgnoreCase(artist)) && (song.getTrack().equalsIgnoreCase(track))) {
+                File path = new File(Environment.getExternalStorageDirectory() + File.separator + "Lyrically/");
+                File lyricsFile = new File(path, song.getId() + ".txt");
+                try {
+                    FileWriter fileWriter = new FileWriter(lyricsFile);
+                    fileWriter.write(lyrics);
+                    fileWriter.flush();
+                    fileWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
     class FetchLyrics extends AsyncTask {
 
         boolean found = true;
@@ -346,43 +466,66 @@ public class LyricsService extends Service {
 
 
             try {
-                url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics+genius+" + artistU + "+" + trackU, "UTF-8");
 
-
+                url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics+azlyrics+" + artistU + "+" + trackU, "UTF-8");
                 Document document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
                 Element results = document.select("h3.r > a").first();
 
                 lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"));
                 Element element;
                 String temp;
-                if (lyricURL.contains("genius")) {
 
+                if (lyricURL.contains("azlyrics.com/lyrics")) {
                     document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
-                    title = document.select("meta[property=og:title]").first().attr("content");
+                    title = artist + " - " + track;
+                    String page = document.toString();
 
-                    Elements selector = document.select("div.h2");
+                    page = page.substring(page.indexOf("that. -->") + 9);
+                    page = page.substring(0, page.indexOf("</div>"));
+                    temp = page;
 
-                    for (Element e : selector) {
-                        e.remove();
-                    }
-
-                    element = document.select("div[class=song_body-lyrics]").first();
-                    temp = element.toString().substring(0, element.toString().indexOf("</lyrics>"));
                 } else {
 
-                    url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics.wikia+" + trackU + "+" + artistU, "UTF-8");
-
-
+                    url = "https://www.google.com/search?q=" + URLEncoder.encode("genius+" + artistU + "+" + trackU + "lyrics", "UTF-8");
                     document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
 
                     results = document.select("h3.r > a").first();
                     lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"));
-                    document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
-                    title = document.select("meta[property=og:title]").first().attr("content");
-                    title = title.replace(":", " - ");
 
-                    element = document.select("div[class=lyricbox]").first();
-                    temp = element.toString();
+
+                    if (lyricURL.contains("genius")) {
+
+                        document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
+                        title = document.select("meta[property=og:title]").first().attr("content");
+
+                        Elements selector = document.select("div.h2");
+
+                        for (Element e : selector) {
+                            e.remove();
+                        }
+
+                        element = document.select("div[class=song_body-lyrics]").first();
+                        temp = element.toString().substring(0, element.toString().indexOf("</lyrics>"));
+                    } else {
+
+                        url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics.wikia+" + trackU + "+" + artistU, "UTF-8");
+
+
+                        document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
+
+                        results = document.select("h3.r > a").first();
+                        lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"));
+
+
+                        document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
+                        title = document.select("meta[property=og:title]").first().attr("content");
+                        title = title.replace(":", " - ");
+
+                        element = document.select("div[class=lyricbox]").first();
+                        temp = element.toString();
+                    }
+
+
                 }
 
                 temp = temp.replaceAll("(?i)<br[^>]*>", "br2n");
@@ -416,10 +559,10 @@ public class LyricsService extends Service {
         @Override
         protected void onPostExecute(Object o) {
             if (!found || !(lyrics.length() > 0)) {
-                lyricsTV.setText(getResources().getString(R.string.lyrics));
+                lyricsTV.setText("");
                 lyricsTV.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.GONE);
-                titleTV.setText("No lyrics found");
+                titleTV.setText(getResources().getString(R.string.noLyricsFound));
                 refresh.setVisibility(View.VISIBLE);
                 refresh.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -441,6 +584,7 @@ public class LyricsService extends Service {
             if (lyricsTV.getVisibility() != View.VISIBLE)
                 lyricsTV.setVisibility(View.VISIBLE);
 
+            saveLyricsOffline(lyrics);
 
             super.onPostExecute(o);
         }
