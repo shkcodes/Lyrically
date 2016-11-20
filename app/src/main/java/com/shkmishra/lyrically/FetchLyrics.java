@@ -81,7 +81,7 @@ public class FetchLyrics extends IntentService {
 
             } else {
 
-                url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics+genius+" + artistU + "+" + trackU, "UTF-8");
+                url = "https://www.google.com/search?q=" + URLEncoder.encode("genius+" + artistU + "+" + trackU + "lyrics", "UTF-8");
                 document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
 
                 results = document.select("h3.r > a").first();
