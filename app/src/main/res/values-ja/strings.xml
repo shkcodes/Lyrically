@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Lyrically</string>
+    <string name="menuSettings">設定</string>
+    <string name="downloadingLyrics">歌詞のダウンロード中</string>
+    <string name="lyricsDownloaded">歌詞をダウンロードしました</string>
+    <string name="noLyricsFound">歌詞が見つかりません</string>
+
+
+    <string name="download">ダウンロード</string>
+    <string name="downloadHelp">オフラインで使用するための歌詞をダウンロードします</string>
+
+
+    <string name="tutorial">チュートリアル</string>
+    <string name="tutorialHelp">このアプリの使い方を学びます</string>
+
+
+    <string name="source">ソース</string>
+    <string name="sourceHelp">このアプリのソースコードを表示します</string>
+
+
+    <string name="about">他のアプリ</string>
+    <string name="aboutHelp">私の他のアプリをチェックしてください</string>
+    <string name="lyrcisHint">歌詞はここに表示されます</string>
+
+
+</resources>
