@@ -52,6 +52,8 @@ public class DownloadService extends Service {
 
         }
 
+        cursor.close();
+
         final NotificationManager mNotifyManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
