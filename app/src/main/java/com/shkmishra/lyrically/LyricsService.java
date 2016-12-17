@@ -332,6 +332,8 @@ public class LyricsService extends Service {
         iF.addAction("com.spotify.music.playbackstatechanged");
         iF.addAction("com.android.music.metachanged");
         iF.addAction("com.android.music.playstatechanged");
+        iF.addAction("com.jrtstudio.AnotherMusicPlayer.playstatechanged");
+        iF.addAction("com.jrtstudio.AnotherMusicPlayer.metachanged");
         registerReceiver(musicReceiver, iF);
 
 

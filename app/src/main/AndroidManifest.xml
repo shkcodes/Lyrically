@@ -39,7 +39,7 @@
             <intent-filter>
                 <action android:name="com.android.music.playstatechanged" />
                 <action android:name="com.spotify.music.playbackstatechanged" />
-
+                <action android:name="com.jrtstudio.AnotherMusicPlayer.playstatechanged" />
             </intent-filter>
         </receiver>
 
