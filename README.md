@@ -3,7 +3,7 @@
 An everywhere lyrics app which can be used by simply swiping a part of your screen. See the lyrics without interrupting what you're doing.
 
 
-    Music Players tested : Google Play Music ,Spotify, Phonograph, Shuttle, Poweramp, BlackPlayer
+    Music Players tested : Google Play Music ,Spotify, Phonograph, Shuttle, Poweramp, BlackPlayer, Rocket Player
 
 
 
