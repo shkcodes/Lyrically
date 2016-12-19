@@ -58,7 +58,7 @@ public class PreferenceActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        isMusicPlaying = audioManager.isMusicActive();
+        isMusicPlaying = audioManager.isMusicActive(); // if music was playing when this activity was started, start the LyricsService on exit
         checkDrawOverlayPermission();
     }
 
@@ -106,6 +106,7 @@ public class PreferenceActivity extends AppCompatActivity {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            // changes made to these preference will be reflected instantly in the trigger; for others, restart the service
             if (!(key.equals("triggerOffset") || key.equals("triggerWidth") || key.equals("triggerHeight"))) {
                 Intent intent = new Intent(getActivity(), PreferenceTrigger.class);
                 getActivity().stopService(intent);

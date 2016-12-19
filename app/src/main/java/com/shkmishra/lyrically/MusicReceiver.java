@@ -19,6 +19,7 @@ public class MusicReceiver extends BroadcastReceiver {
 
         boolean isRunning = false;
 
+        // check if the service is already running
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if ("com.shkmishra.lyrically.LyricsService".equals(service.service.getClassName())) {
@@ -30,7 +31,7 @@ public class MusicReceiver extends BroadcastReceiver {
             Intent intent1 = new Intent(context, LyricsService.class);
             if (!isRunning)
                 context.startService(intent1);
-        } else {
+        } else { // stop the service if the music stops
             final NotificationManager mNotifyManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotifyManager.cancel(26181317);

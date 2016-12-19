@@ -17,6 +17,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+/*
+Fetches the lyrics and stores them in a text file. The fetching part is the same as in LyricsService.java.
+ */
 public class FetchLyrics extends IntentService {
 
     public FetchLyrics() {
@@ -46,7 +49,8 @@ public class FetchLyrics extends IntentService {
 
         if (!lyricsFile.exists())
             getLyrics();
-        else try {
+        else
+            try { // if the text file with the current song ID already exists, skip fetching the lyrics
             messenger.send(new Message());
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -60,6 +64,7 @@ public class FetchLyrics extends IntentService {
     }
 
     void getLyrics() {
+        // same code as the doInBackground function from LyricsService.java
         try {
             String artistU = artist.replaceAll(" ", "+");
             String trackU = track.replaceAll(" ", "+");
@@ -128,7 +133,7 @@ public class FetchLyrics extends IntentService {
             if (lyricURL.contains("genius"))
                 lyrics = lyrics.substring(lyrics.indexOf("Lyrics") + 6);
 
-            writeToFile(lyrics);
+            writeToFile(lyrics); // write the lyrics to a text file
 
 
         } catch (IOException e) {
@@ -158,6 +163,7 @@ public class FetchLyrics extends IntentService {
     }
 
     private void noLyricsFound() {
+        // if no lyrics were found, write the artist and song name to the No Lyrics Found.txt
         try {
             FileWriter fileWriter = new FileWriter(notFound, true);
             fileWriter.append(artist + " | " + track + "\n");

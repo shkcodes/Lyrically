@@ -7,8 +7,10 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
+/*
+  Used to show the lyrics panel when the user clicks on the notification
+ */
 public class ShowLyrics extends IntentService {
-
 
     public ShowLyrics() {
         super("ShowLyrics");

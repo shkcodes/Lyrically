@@ -19,6 +19,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+/*
+  This file is almost identical to the LyricsService.java. I just removed the lyrics fetching code and added the SharedPrefs code.
+ */
+
 public class PreferenceTrigger extends Service {
 
     SharedPreferences sharedPreferences;
@@ -172,6 +176,7 @@ public class PreferenceTrigger extends Service {
         windowManager.addView(trigger, triggerParams);
 
 
+        // check the onProgressChanged function in SeekBarPreference2.java
         sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {

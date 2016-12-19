@@ -63,6 +63,7 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
     }
 
 
+    // updates the preference once the user lets go of the seekbar
     private void setProgress(int progress, boolean notifyChanged) {
         if (progress != mProgress) {
             mProgress = progress;

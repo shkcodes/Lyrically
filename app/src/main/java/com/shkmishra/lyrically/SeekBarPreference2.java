@@ -40,6 +40,7 @@ public class SeekBarPreference2 extends Preference implements SeekBar.OnSeekBarC
         mSeekBar.setOnSeekBarChangeListener(this);
     }
 
+    // update the preference as the user moves the seekbar. Used for triggerOffset, triggerWidth and triggerHeight
     @Override
     public void onProgressChanged(
             SeekBar seekBar, int progress, boolean fromUser) {

@@ -24,10 +24,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         isStoragePermissionGranted();
-        cardView1 = (CardView) findViewById(R.id.card1);
-        cardView2 = (CardView) findViewById(R.id.card2);
-        cardView3 = (CardView) findViewById(R.id.card3);
-        cardView4 = (CardView) findViewById(R.id.card4);
+        cardView1 = (CardView) findViewById(R.id.card1);  // download lyrics
+        cardView2 = (CardView) findViewById(R.id.card2);  // watch tutorial
+        cardView3 = (CardView) findViewById(R.id.card3);  // view source code
+        cardView4 = (CardView) findViewById(R.id.card4);  // view other apps
 
         cardView1.setOnClickListener(new View.OnClickListener() {
             @Override

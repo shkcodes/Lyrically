@@ -27,6 +27,7 @@ public class DownloadService extends Service {
     @Override
     public int onStartCommand(Intent intent, final int flags, int startId) {
 
+        // get the list of songs present on the device
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
         String[] projection = {
                 MediaStore.Audio.Media._ID,
@@ -66,6 +67,7 @@ public class DownloadService extends Service {
                 mBuilder.build());
 
 
+        // handler to update the notification progress bar
         Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -83,12 +85,13 @@ public class DownloadService extends Service {
         };
 
 
+
         File path = new File(Environment.getExternalStorageDirectory() + File.separator + "Lyrically/");
         File notFound = new File(path, "No Lyrics Found.txt");
         notFound.delete();
 
         Messenger messenger = new Messenger(handler);
-        for (Song song : songArrayList) {
+        for (Song song : songArrayList) { // fetch the lyrics for each song
             Intent intent1 = new Intent(this, FetchLyrics.class);
             intent1.putExtra("track", song.getTrack());
             intent1.putExtra("messenger", messenger);

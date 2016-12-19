@@ -82,8 +82,10 @@ public class LyricsService extends Service {
             boolean isPlaying = extras.getBoolean(extras.containsKey("playstate") ? "playstate" : "playing", false);
             try {
 
+                // check if the song was changed by comparing the current artist and title with those received from the broadcasr
                 if (isPlaying && !((artist.equalsIgnoreCase(intent.getStringExtra("artist")) && (track.equalsIgnoreCase(intent.getStringExtra("track")))))) {
 
+                    // clear the lyrics sheet
                     title = "";
                     lyrics = "";
                     progressBar.setVisibility(View.VISIBLE);
@@ -91,12 +93,14 @@ public class LyricsService extends Service {
                     lyricsTV.setText("");
                     lyricsTV.setVisibility(View.INVISIBLE);
                     refresh.setVisibility(View.GONE);
+
                     artist = intent.getStringExtra("artist");
                     track = intent.getStringExtra("track");
+
                     for (Song song : songArrayList) {
-                        if ((song.getArtist().equalsIgnoreCase(artist)) && (song.getTrack().equalsIgnoreCase(track))) {
-                            lyrics = getLyrics(song);
-                            if (!lyrics.equals("")) {
+                        if ((song.getArtist().equalsIgnoreCase(artist)) && (song.getTrack().equalsIgnoreCase(track))) { // check if the song is present on the device
+                            lyrics = getLyrics(song); // gets the lyrics from the text file
+                            if (!lyrics.equals("")) {  // indicates we have offline lyrics available
                                 title = artist + " - " + track;
                                 lyricsTV.setText(lyrics);
                                 lyricsTV.setVisibility(View.VISIBLE);
@@ -104,7 +108,7 @@ public class LyricsService extends Service {
                                 refresh.setVisibility(View.GONE);
                                 titleTV.setText(title);
                                 progressBar.setVisibility(View.GONE);
-                            } else {
+                            } else { // offline lyrics not found, fetch them from the Internet
                                 lyricsTV.setText("");
                                 lyricsTV.setVisibility(View.INVISIBLE);
                                 artistU = artist.replaceAll(" ", "+");
@@ -115,7 +119,7 @@ public class LyricsService extends Service {
                             offlineMusic = true;
                         }
                     }
-                    if (!offlineMusic) {
+                    if (!offlineMusic) { // indicates that the song is being streamed
                         artistU = artist.replaceAll(" ", "+");
                         trackU = track.replaceAll(" ", "+");
                         new FetchLyrics().execute();
@@ -142,11 +146,12 @@ public class LyricsService extends Service {
         int width = (sharedPreferences.getInt("triggerWidth", 10)) * 2;
         int height = (sharedPreferences.getInt("triggerHeight", 10)) * 2;
 
-        getSongsList();
+        getSongsList(); // get list of songs present on the device
         String path = Environment.getExternalStorageDirectory() + File.separator + "Lyrically/";
         File directory = new File(path);
-        lyricsFiles = directory.listFiles();
+        lyricsFiles = directory.listFiles(); // files present in the Lyrically folder
 
+        // params for the invisible trigger
         triggerParams = new WindowManager.LayoutParams(
                 width, height,
 
@@ -160,6 +165,7 @@ public class LyricsService extends Service {
 
         int panelHeight = (sharedPreferences.getInt("panelHeight", 60)) * displayMetrics.heightPixels / 100;
 
+        // params for the lyrics panel
         lyricsPanelParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 panelHeight,
@@ -177,7 +183,7 @@ public class LyricsService extends Service {
         lyricsPanelParams.y = 0;
 
 
-        int triggerPosition = Integer.parseInt(sharedPreferences.getString("triggerPos", "1"));
+        int triggerPosition = Integer.parseInt(sharedPreferences.getString("triggerPos", "1")); // 1 = left side of the screen, 2 = right side
         double offset = (double) (sharedPreferences.getInt("triggerOffset", 10)) / 100;
 
         switch (triggerPosition) {
@@ -201,7 +207,7 @@ public class LyricsService extends Service {
 
         container = new LinearLayout(this);
 
-
+        // views in the lyrics panel
         scrollView = (NestedScrollView) bottomLayout.findViewById(R.id.lyricsScrollView);
         titleTV = (TextView) bottomLayout.findViewById(R.id.title);
         lyricsTV = (TextView) bottomLayout.findViewById(R.id.lyrics);
@@ -209,7 +215,7 @@ public class LyricsService extends Service {
         progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_IN);
         refresh = (ImageView) bottomLayout.findViewById(R.id.refresh);
 
-
+        // swipe listener to dismiss the lyrics panel
         bottomLayout.setOnTouchListener(new SwipeDismissTouchListener(bottomLayout, null, new SwipeDismissTouchListener.DismissCallbacks() {
             @Override
             public boolean canDismiss(Object token) {
@@ -220,12 +226,11 @@ public class LyricsService extends Service {
             public void onDismiss(View view, Object token) {
                 container.removeView(bottomLayout);
                 windowManager.removeView(container);
-
             }
         }));
 
 
-        final int swipeDirection = Integer.parseInt(sharedPreferences.getString("swipeDirection", "1"));
+        final int swipeDirection = Integer.parseInt(sharedPreferences.getString("swipeDirection", "1")); // swipe direction for the invisible trigger
         trigger.setOnTouchListener(new OnSwipeTouchListener(this) {
                                        @Override
                                        public void onSwipeUp() {
@@ -277,6 +282,7 @@ public class LyricsService extends Service {
                                    }
         );
 
+        // handler to show the lyrics panel when the notification is clicked
         final Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -291,6 +297,8 @@ public class LyricsService extends Service {
                 }
             }
         };
+
+        // removes the invisible trigger if you click on it; otherwise the area taken by the trigger seems unresponsive to the user
         trigger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -306,7 +314,6 @@ public class LyricsService extends Service {
 
 
         windowManager.addView(trigger, triggerParams);
-
 
         NotificationManager mNotifyManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -351,6 +358,7 @@ public class LyricsService extends Service {
         return null;
     }
 
+    // remove the lyrics panel and the trigger and unregister the receiver
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -385,7 +393,6 @@ public class LyricsService extends Service {
 
     private void getSongsList() {
 
-
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
         String[] projection = {
                 MediaStore.Audio.Media._ID,
@@ -418,7 +425,7 @@ public class LyricsService extends Service {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (File file : lyricsFiles) {
-            if (file.getName().equals(song.getId() + ".txt")) {
+            if (file.getName().equals(song.getId() + ".txt")) { // the text files are named after the song IDs
 
                 try {
                     String line;
@@ -455,7 +462,7 @@ public class LyricsService extends Service {
         }
     }
 
-
+    // fetches the lyrics from the Internet
     class FetchLyrics extends AsyncTask {
 
         boolean found = true;
@@ -466,18 +473,24 @@ public class LyricsService extends Service {
         @Override
         protected Object doInBackground(Object[] params) {
 
+            /*
+            Currently using 3 providers : azlyrics, genius and lyrics.wikia; in that order
+            Procedure :
+            - Google the artist + song name + provider name
+            - Grab the first result and if it is from the provider we wanted, get the lyrics
+             */
 
             try {
 
-                url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics+azlyrics+" + artistU + "+" + trackU, "UTF-8");
+                url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics+azlyrics+" + artistU + "+" + trackU, "UTF-8"); // Google URL
                 Document document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
                 Element results = document.select("h3.r > a").first();
 
-                lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"));
+                lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&")); // grabbing the first result
                 Element element;
                 String temp;
 
-                if (lyricURL.contains("azlyrics.com/lyrics")) {
+                if (lyricURL.contains("azlyrics.com/lyrics")) { // checking if from the provider we wanted
                     document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
                     title = artist + " - " + track;
                     String page = document.toString();
@@ -530,10 +543,11 @@ public class LyricsService extends Service {
 
                 }
 
+                // preserving line breaks
+
                 temp = temp.replaceAll("(?i)<br[^>]*>", "br2n");
                 temp = temp.replaceAll("]", "]shk");
                 temp = temp.replaceAll("\\[", "shk[");
-
 
                 lyrics = Jsoup.parse(temp).text();
                 lyrics = lyrics.replaceAll("br2n", "\n");
@@ -560,7 +574,7 @@ public class LyricsService extends Service {
 
         @Override
         protected void onPostExecute(Object o) {
-            if (!found || !(lyrics.length() > 0)) {
+            if (!found || !(lyrics.length() > 0)) { // if no lyrics found
                 lyricsTV.setText("");
                 lyricsTV.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.GONE);
@@ -586,7 +600,7 @@ public class LyricsService extends Service {
             if (lyricsTV.getVisibility() != View.VISIBLE)
                 lyricsTV.setVisibility(View.VISIBLE);
 
-            saveLyricsOffline(lyrics);
+            saveLyricsOffline(lyrics); // store the lyrics in a text file
 
             super.onPostExecute(o);
         }
