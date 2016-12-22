@@ -21,6 +21,8 @@
     <string name="about">他のアプリ</string>
     <string name="aboutHelp">私の他のアプリをチェックしてください</string>
     <string name="lyricsHint">歌詞はここに表示されます</string>
+    <string name="updateTitle">利用可能な更新</string>
+    <string name="updateText">更新するにはここをクリック</string>
 
 
 </resources>
