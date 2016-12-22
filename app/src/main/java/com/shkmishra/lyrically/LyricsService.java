@@ -51,6 +51,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class LyricsService extends Service {
 
@@ -334,6 +335,8 @@ public class LyricsService extends Service {
                 mBuilder.build());
 
 
+        checkForUpdates();
+
         IntentFilter iF = new IntentFilter();
         iF.addAction("com.spotify.music.metadatachanged");
         iF.addAction("com.spotify.music.playbackstatechanged");
@@ -345,6 +348,17 @@ public class LyricsService extends Service {
 
 
         return Service.START_STICKY;
+    }
+
+
+    private void checkForUpdates() {
+        int lastCheck = sharedPreferences.getInt("updateWeek", 0);
+        int currentWeek = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
+
+        if (currentWeek != lastCheck) {
+            startService(new Intent(this, UpdateService.class));
+            sharedPreferences.edit().putInt("updateWeek", currentWeek).apply();
+        }
     }
 
     private void vibrate() {

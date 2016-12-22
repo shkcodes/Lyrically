@@ -48,6 +48,7 @@
         <service android:name=".ShowLyrics"/>
         <service android:name=".DownloadService"/>
         <service android:name=".FetchLyrics" />
+        <service android:name=".UpdateService" />
 
 
 

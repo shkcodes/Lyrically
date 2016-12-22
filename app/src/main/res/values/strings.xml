@@ -20,7 +20,9 @@
 
     <string name="about">Other Apps</string>
     <string name="aboutHelp">Check out my other apps</string>
-    <string name="lyrcisHint">Your lyrics will appear here</string>
+    <string name="lyricsHint">Your lyrics will appear here</string>
+    <string name="updateTitle">Update available</string>
+    <string name="updateText">Click here to update</string>
 
 
 </resources>

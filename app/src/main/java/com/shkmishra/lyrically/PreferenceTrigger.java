@@ -101,7 +101,7 @@ public class PreferenceTrigger extends Service {
 
         bottomLayout = layoutInflater.inflate(R.layout.lyrics_sheet, null);
         TextView titleTV = (TextView) bottomLayout.findViewById(R.id.title);
-        titleTV.setText(getResources().getString(R.string.lyrcisHint));
+        titleTV.setText(getResources().getString(R.string.lyricsHint));
 
         bottomLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         bottomLayout.setOnTouchListener(new SwipeDismissTouchListener(bottomLayout, null, new SwipeDismissTouchListener.DismissCallbacks() {
