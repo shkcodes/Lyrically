@@ -5,11 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
@@ -59,35 +56,14 @@ public class PreferenceActivity extends AppCompatActivity {
         super.onResume();
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         isMusicPlaying = audioManager.isMusicActive(); // if music was playing when this activity was started, start the LyricsService on exit
-        checkDrawOverlayPermission();
-    }
 
-    public void checkDrawOverlayPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(this)) {
-                final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, 69);
-            } else {
-                Intent intent = new Intent(this, PreferenceTrigger.class);
-                startService(intent);
+        Intent intent = new Intent(this, PreferenceTrigger.class);
+        startService(intent);
 
-                final NotificationManager mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotifyManager.cancel(26181317);
-                Intent intent1 = new Intent(this, LyricsService.class);
-                stopService(intent1);
-
-            }
-        } else {
-            Intent intent = new Intent(this, PreferenceTrigger.class);
-            startService(intent);
-
-            final NotificationManager mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotifyManager.cancel(26181317);
-            Intent intent1 = new Intent(this, LyricsService.class);
-            stopService(intent1);
-
-        }
+        final NotificationManager mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotifyManager.cancel(26181317);
+        Intent intent1 = new Intent(this, LyricsService.class);
+        stopService(intent1);
     }
 
     public static class MyPreferenceFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {

@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 
 /*
-Fetches the lyrics and stores them in a text file. The fetching part is the same as in LyricsService.java.
+Fetches the lyrics and stores them in a text file. The fetching code is the same as in LyricsService.java.
  */
 public class FetchLyrics extends IntentService {
 
@@ -38,9 +38,7 @@ public class FetchLyrics extends IntentService {
         songID = intent.getLongExtra("id", 0);
         messenger = (Messenger) intent.getExtras().get("messenger");
 
-        File file = new File(Environment.getExternalStorageDirectory(), "Lyrically");
-        if (!file.exists())
-            file.mkdirs();
+
         File path = new File(Environment.getExternalStorageDirectory() + File.separator + "Lyrically/");
         notFound = new File(path, "No Lyrics Found.txt");
 

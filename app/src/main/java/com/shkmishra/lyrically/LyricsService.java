@@ -83,7 +83,7 @@ public class LyricsService extends Service {
             boolean isPlaying = extras.getBoolean(extras.containsKey("playstate") ? "playstate" : "playing", false);
             try {
 
-                // check if the song was changed by comparing the current artist and title with those received from the broadcasr
+                // check if the song was changed by comparing the current artist and title with those received from the broadcast
                 if (isPlaying && !((artist.equalsIgnoreCase(intent.getStringExtra("artist")) && (track.equalsIgnoreCase(intent.getStringExtra("track")))))) {
 
                     // clear the lyrics sheet
@@ -100,6 +100,7 @@ public class LyricsService extends Service {
 
                     for (Song song : songArrayList) {
                         if ((song.getArtist().equalsIgnoreCase(artist)) && (song.getTrack().equalsIgnoreCase(track))) { // check if the song is present on the device
+
                             lyrics = getLyrics(song); // gets the lyrics from the text file
                             if (!lyrics.equals("")) {  // indicates we have offline lyrics available
                                 title = artist + " - " + track;
@@ -148,9 +149,13 @@ public class LyricsService extends Service {
         int height = (sharedPreferences.getInt("triggerHeight", 10)) * 2;
 
         getSongsList(); // get list of songs present on the device
+        File file = new File(Environment.getExternalStorageDirectory(), "Lyrically");
+        if (!file.exists())
+            file.mkdirs();
         String path = Environment.getExternalStorageDirectory() + File.separator + "Lyrically/";
         File directory = new File(path);
-        lyricsFiles = directory.listFiles(); // files present in the Lyrically folder
+        if (directory.exists())
+            lyricsFiles = directory.listFiles(); // files present in the Lyrically folder
 
         // params for the invisible trigger
         triggerParams = new WindowManager.LayoutParams(
@@ -438,6 +443,8 @@ public class LyricsService extends Service {
 
         StringBuilder stringBuilder = new StringBuilder();
 
+        if (lyricsFiles == null)
+            return "";
         for (File file : lyricsFiles) {
             if (file.getName().equals(song.getId() + ".txt")) { // the text files are named after the song IDs
 
@@ -475,6 +482,7 @@ public class LyricsService extends Service {
             }
         }
     }
+
 
     // fetches the lyrics from the Internet
     class FetchLyrics extends AsyncTask {
@@ -552,6 +560,7 @@ public class LyricsService extends Service {
 
                         element = document.select("div[class=lyricbox]").first();
                         temp = element.toString();
+
                     }
 
 
