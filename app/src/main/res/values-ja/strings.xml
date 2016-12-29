@@ -23,6 +23,10 @@
     <string name="lyricsHint">歌詞はここに表示されます</string>
     <string name="updateTitle">利用可能な更新</string>
     <string name="updateText">更新するにはここをクリック</string>
+    <string name="draw_over_other_apps">オーバーレイ許可</string>
+    <string name="read_write_storage">読み取り/書き込み記憶域</string>
+    <string name="permissions_toast">Lyrically - 適切な許可を与えてください</string>
+    <string name="permissions_needed">必要なアクセス許可</string>
 
 
 </resources>

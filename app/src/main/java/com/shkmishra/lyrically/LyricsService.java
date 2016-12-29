@@ -1,5 +1,6 @@
 package com.shkmishra.lyrically;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
@@ -22,6 +24,7 @@ import android.os.Messenger;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.NotificationCompat;
@@ -38,6 +41,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -136,9 +140,13 @@ public class LyricsService extends Service {
     };
 
     @Override
+    @SuppressLint("NewApi")
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-
+        if (!Settings.canDrawOverlays(this) || !(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+            Toast.makeText(this, R.string.permissions_toast, Toast.LENGTH_SHORT).show();
+            return 0;
+        }
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         displayMetrics = new DisplayMetrics();
@@ -402,10 +410,10 @@ public class LyricsService extends Service {
                 }
             });
             windowManager.removeView(trigger);
-        } catch (IllegalArgumentException e) {
+            unregisterReceiver(musicReceiver);
+        } catch (IllegalArgumentException | NullPointerException e) {
             e.printStackTrace();
         }
-        unregisterReceiver(musicReceiver);
 
     }
 

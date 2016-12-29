@@ -23,6 +23,10 @@
     <string name="lyricsHint">Your lyrics will appear here</string>
     <string name="updateTitle">Update available</string>
     <string name="updateText">Click here to update</string>
+    <string name="draw_over_other_apps">DRAW OVER OTHER APPS</string>
+    <string name="read_write_storage">READ / WRITE STORAGE</string>
+    <string name="permissions_toast">Lyrically - Please grant the proper permissions</string>
+    <string name="permissions_needed">Permissions Needed</string>
 
 
 </resources>
