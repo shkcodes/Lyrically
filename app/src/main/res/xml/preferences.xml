@@ -57,4 +57,13 @@
     </PreferenceCategory>
 
 
+    <PreferenceCategory android:title="Caching">
+
+        <CheckBoxPreference
+            android:key="cacheAll"
+            android:summary="Cache all the lyrics shown by Lyrically"
+            android:title="Cache All" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

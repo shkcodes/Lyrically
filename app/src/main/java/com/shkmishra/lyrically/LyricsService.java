@@ -63,6 +63,7 @@ public class LyricsService extends Service {
     String title, lyrics;
     boolean offlineMusic = false;
     File[] lyricsFiles;
+    boolean cacheAll = false;
 
     String track = "", artist = "", artistU, trackU;
     TextView titleTV, lyricsTV;
@@ -126,9 +127,26 @@ public class LyricsService extends Service {
                         }
                     }
                     if (!offlineMusic) { // indicates that the song is being streamed
-                        artistU = artist.replaceAll(" ", "+");
-                        trackU = track.replaceAll(" ", "+");
-                        new FetchLyrics().execute();
+                        if (cacheAll) {
+                            lyrics = getLyricsStreaming();
+                            if (!lyrics.equals("")) {
+                                title = artist + " - " + track;
+                                lyricsTV.setText(lyrics);
+                                lyricsTV.setVisibility(View.VISIBLE);
+                                scrollView.fullScroll(ScrollView.FOCUS_UP);
+                                refresh.setVisibility(View.GONE);
+                                titleTV.setText(title);
+                                progressBar.setVisibility(View.GONE);
+                            } else {
+                                artistU = artist.replaceAll(" ", "+");
+                                trackU = track.replaceAll(" ", "+");
+                                new FetchLyrics().execute();
+                            }
+                        } else {
+                            artistU = artist.replaceAll(" ", "+");
+                            trackU = track.replaceAll(" ", "+");
+                            new FetchLyrics().execute();
+                        }
                     }
 
                 }
@@ -156,14 +174,11 @@ public class LyricsService extends Service {
         int width = (sharedPreferences.getInt("triggerWidth", 10)) * 2;
         int height = (sharedPreferences.getInt("triggerHeight", 10)) * 2;
 
+        cacheAll = sharedPreferences.getBoolean("cacheAll", false);
         getSongsList(); // get list of songs present on the device
         File file = new File(Environment.getExternalStorageDirectory(), "Lyrically");
         if (!file.exists())
             file.mkdirs();
-        String path = Environment.getExternalStorageDirectory() + File.separator + "Lyrically/";
-        File directory = new File(path);
-        if (directory.exists())
-            lyricsFiles = directory.listFiles(); // files present in the Lyrically folder
 
         // params for the invisible trigger
         triggerParams = new WindowManager.LayoutParams(
@@ -451,6 +466,11 @@ public class LyricsService extends Service {
 
         StringBuilder stringBuilder = new StringBuilder();
 
+        String path = Environment.getExternalStorageDirectory() + File.separator + "Lyrically/";
+        File directory = new File(path);
+        if (directory.exists())
+            lyricsFiles = directory.listFiles(); // files present in the Lyrically folder
+
         if (lyricsFiles == null)
             return "";
         for (File file : lyricsFiles) {
@@ -488,6 +508,53 @@ public class LyricsService extends Service {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    private String getLyricsStreaming() {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        String fileName = Integer.toString((artist + track).hashCode());
+
+        String path = Environment.getExternalStorageDirectory() + File.separator + "Lyrically/";
+        File directory = new File(path);
+        if (directory.exists())
+            lyricsFiles = directory.listFiles(); // files present in the Lyrically folder
+
+        if (lyricsFiles == null)
+            return "";
+        for (File file : lyricsFiles) {
+            if (file.getName().equals(fileName + ".txt")) { // the text files are named after the song IDs
+
+                try {
+                    String line;
+                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+                    while ((line = bufferedReader.readLine()) != null) {
+                        stringBuilder.append(line);
+                        stringBuilder.append("\n");
+                    }
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return stringBuilder.toString();
+            }
+        }
+        return "";
+    }
+
+    private void saveLyricsStreaming(String lyrics) {
+        String fileName = Integer.toString((artist + track).hashCode());
+
+        File path = new File(Environment.getExternalStorageDirectory() + File.separator + "Lyrically/");
+        File lyricsFile = new File(path, fileName + ".txt");
+        try {
+            FileWriter fileWriter = new FileWriter(lyricsFile);
+            fileWriter.write(lyrics);
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -631,7 +698,8 @@ public class LyricsService extends Service {
             if (lyricsTV.getVisibility() != View.VISIBLE)
                 lyricsTV.setVisibility(View.VISIBLE);
 
-            saveLyricsOffline(lyrics); // store the lyrics in a text file
+            if (offlineMusic) saveLyricsOffline(lyrics); // store the lyrics in a text file
+            else if (cacheAll) saveLyricsStreaming(lyrics);
 
             super.onPostExecute(o);
         }
