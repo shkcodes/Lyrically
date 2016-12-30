@@ -162,6 +162,7 @@ public class LyricsService extends Service {
     @SuppressLint("NewApi")
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && (!Settings.canDrawOverlays(this) || !(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED))) {
             Toast.makeText(this, R.string.permissions_toast, Toast.LENGTH_SHORT).show();
             return 0;
