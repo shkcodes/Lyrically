@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -161,7 +162,7 @@ public class LyricsService extends Service {
     @SuppressLint("NewApi")
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        if (!Settings.canDrawOverlays(this) || !(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && (!Settings.canDrawOverlays(this) || !(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED))) {
             Toast.makeText(this, R.string.permissions_toast, Toast.LENGTH_SHORT).show();
             return 0;
         }
