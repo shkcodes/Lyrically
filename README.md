@@ -1,5 +1,13 @@
 # Lyrically
 
+<img src="https://github.com/shkcodes/Lyrically/blob/master/screenshots/screenshot1.png" alt="alt text" height="640"> 
+<img src="https://github.com/shkcodes/Lyrically/blob/master/screenshots/screenshot2.png" alt="alt text" height="640">
+<img src="https://github.com/shkcodes/Lyrically/blob/master/screenshots/screenshot3.png" alt="alt text" height="640">
+<img src="https://github.com/shkcodes/Lyrically/blob/master/screenshots/screenshot4.png" alt="alt text" height="640">
+
+
+
+
 An everywhere lyrics app which can be used by simply swiping a part of your screen. See the lyrics without interrupting what you're doing.
 
 
