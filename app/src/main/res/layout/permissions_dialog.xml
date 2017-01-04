@@ -36,7 +36,7 @@
             android:layout_centerInParent="true"
             android:id="@+id/button_overlay"
             android:textColor="@android:color/white"
-            android:backgroundTint="@android:color/holo_red_light"
+            android:backgroundTint="@color/colorAccent"
             android:layout_height="wrap_content" />
 
         <ImageView
