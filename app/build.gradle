@@ -8,8 +8,8 @@ android {
         applicationId "com.shkmishra.lyrically"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 10
-        versionName "0.41"
+        versionCode 11
+        versionName "0.42"
     }
     buildTypes {
         release {
