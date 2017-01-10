@@ -2,67 +2,67 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="Trigger Settings">
+        android:title="@string/trigger_settings_title">
         <ListPreference
             android:defaultValue="1"
         android:entries="@array/triggerPos"
             android:entryValues="@array/triggerPosValues"
             android:key="triggerPos"
-            android:summary="The position of the area which detects the swipe"
-            android:title="Trigger Position" />
+            android:summary="@string/trigger_pos_summary"
+            android:title="@string/trigger_pos_title" />
 
         <com.shkmishra.lyrically.SeekBarPreference
             android:defaultValue="10"
             android:key="triggerOffset"
-            android:summary="Trigger Offset"/>
+            android:summary="@string/trigger_offset_summary"/>
 
         <ListPreference
             android:defaultValue="1"
             android:entries="@array/triggerSwipeDirection"
             android:entryValues="@array/triggerSwipeDirectionValues"
             android:key="swipeDirection"
-            android:summary="The direction in which you swipe to see the lyrics"
-            android:title="Swipe Direction" />
+            android:summary="@string/trigger_swipe_direction_summary"
+            android:title="@string/trigger_swipe_direction_title" />
 
         <com.shkmishra.lyrically.SeekBarPreference
             android:defaultValue="75"
             android:key="triggerWidth"
-            android:summary="Trigger Width"/>
+            android:summary="@string/trigger_width_summary"/>
 
 
         <com.shkmishra.lyrically.SeekBarPreference
             android:defaultValue="75"
             android:key="triggerHeight"
-            android:summary="Trigger Height"/>
+            android:summary="@string/trigger_height_summary"/>
 
 
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="triggerVibration"
-            android:summary="Enable or disable vibration on trigger detection"
-            android:title="Vibration" />
+            android:summary="@string/trigger_vibration_summary"
+            android:title="@string/trigger_vibration_title" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Lyrics Panel Settings">
+        android:title="@string/lyrics_panel_settings_title">
 
 
         <com.shkmishra.lyrically.SeekBarPreference2
             android:defaultValue="60"
             android:key="panelHeight"
-            android:summary="Lyrics Panel Height"/>
+            android:summary="@string/lyrics_panel_height_summary"/>
 
 
     </PreferenceCategory>
 
 
-    <PreferenceCategory android:title="Caching">
+    <PreferenceCategory android:title="@string/cache_settings_title">
 
         <CheckBoxPreference
             android:key="cacheAll"
-            android:summary="Cache all the lyrics shown by Lyrically"
-            android:title="Cache All" />
+            android:summary="@string/cache_all_summary"
+            android:title="@string/cache_all_title" />
 
     </PreferenceCategory>
 
