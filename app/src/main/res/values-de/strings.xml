@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">Lyrically</string>
+    <string name="menuSettings">Einstellungen</string>
+    <string name="downloadingLyrics">Lyrics werden heruntergeladen</string>
+    <string name="lyricsDownloaded">Lyrics heruntergeladen</string>
+    <string name="noLyricsFound">Keine Lyrics gefunden</string>
+
+
+    <string name="download">Herunterladen</string>
+    <string name="downloadHelp">Lyrics für Offline-Nutzung herunterladen</string>
+
+
+    <string name="tutorial">Tutorial</string>
+    <string name="tutorialHelp">Lerne wie diese App funktioniert</string>
+
+
+    <string name="source">Quelle</string>
+    <string name="sourceHelp">Schau dir den Quellcode dieser App an</string>
+
+
+    <string name="about">Andere Apps</string>
+    <string name="aboutHelp">Sieh dir meine anderen Apps an</string>
+    <string name="lyricsHint">Deine Lyrics werden hier angezeigt</string>
+    <string name="updateTitle">Aktualisierung verfügbar</string>
+    <string name="updateText">Klicke hier zum aktualisieren</string>
+    <string name="draw_over_other_apps">ÜBER ANDERE APPS ZIEHEN</string>
+    <string name="read_write_storage">SPEICHER LESEN / SCHREIBEN</string>
+    <string name="permissions_toast">Lyrically - Bitte gebe die nötigen Berechtigungen frei</string>
+    <string name="permissions_needed">Berechtigungen benötigt</string>
+    <string name="download_prompt">Lyrics für %1$s Songs heruntergeladen?</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="please_wait">Bitte warten...</string>
+    <string name="noLyricsFoundNotification">Hier klicken um die Songs zu sehen für welche keine Lyrics gefunden wurden</string>
+
+
+</resources>
