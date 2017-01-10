@@ -2,12 +2,16 @@ package com.shkmishra.lyrically;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -23,6 +27,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,7 +61,57 @@ public class MainActivity extends AppCompatActivity {
         cardView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startService(new Intent(getApplicationContext(), DownloadService.class));
+
+                // progress dialog shown while we get a list of songs on the device
+                ProgressDialog progressDialog = new ProgressDialog(MainActivity.this, R.style.DownloadDialog);
+                progressDialog.setMessage(getResources().getString(R.string.please_wait));
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+
+                final ArrayList<Song> songArrayList = new ArrayList<>();
+                // get the list of songs present on the device
+                String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+                String[] projection = {
+                        MediaStore.Audio.Media._ID,
+                        MediaStore.Audio.Media.ARTIST,
+                        MediaStore.Audio.Media.TITLE,
+                        MediaStore.Audio.Media.DURATION
+                };
+                Cursor cursor = getContentResolver().query(
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        projection,
+                        selection,
+                        null,
+                        null);
+                while (cursor.moveToNext()) {
+                    String artist = cursor.getString(1);
+                    String title = cursor.getString(2);
+                    long songID = Long.parseLong(cursor.getString(0));
+                    long duration = Long.parseLong(cursor.getString(3));
+                    if ((duration / 1000) > 40) {
+                        songArrayList.add(new Song(title, artist, songID));
+                    }
+
+                }
+                cursor.close();
+                progressDialog.dismiss();
+
+                // yes-no dialog before we start downloading the lyrics
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.DownloadDialog);
+                builder.setMessage(getResources().getString(R.string.download_prompt, songArrayList.size())).setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(getApplicationContext(), DownloadService.class);
+                        intent.putExtra("songs", songArrayList);
+                        startService(intent);
+                    }
+                }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
+
             }
         });
 

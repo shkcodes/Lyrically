@@ -27,6 +27,11 @@
     <string name="read_write_storage">読み取り/書き込み記憶域</string>
     <string name="permissions_toast">Lyrically - 適切な許可を与えてください</string>
     <string name="permissions_needed">必要なアクセス許可</string>
+    <string name="download_prompt">歌詞を%1$s曲ダウンロード?</string>
+    <string name="yes">はい</string>
+    <string name="no">いいえ</string>
+    <string name="please_wait">お待ちください…</string>
+    <string name="noLyricsFoundNotification">歌詞が見つからない曲を見るには、ここをクリックしてください</string>
 
 
 </resources>

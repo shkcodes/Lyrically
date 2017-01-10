@@ -27,6 +27,11 @@
     <string name="read_write_storage">READ / WRITE STORAGE</string>
     <string name="permissions_toast">Lyrically - Please grant the proper permissions</string>
     <string name="permissions_needed">Permissions Needed</string>
+    <string name="download_prompt">Download lyrics for %1$s songs?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="noLyricsFoundNotification">Click here to see the songs whose lyrics were not found</string>
 
 
 </resources>
