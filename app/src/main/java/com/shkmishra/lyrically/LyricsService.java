@@ -5,10 +5,8 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -16,7 +14,6 @@ import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -81,82 +78,9 @@ public class LyricsService extends Service {
     LinearLayout container;
     Vibrator vibrator;
     private WindowManager windowManager;
-    private BroadcastReceiver musicReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle extras = intent.getExtras();
+    Intent showLyrics;
+    PendingIntent pendingIntent;
 
-            boolean isPlaying = extras.getBoolean(extras.containsKey("playstate") ? "playstate" : "playing", false);
-            try {
-
-                // check if the song was changed by comparing the current artist and title with those received from the broadcast
-                if (isPlaying && !((artist.equalsIgnoreCase(intent.getStringExtra("artist")) && (track.equalsIgnoreCase(intent.getStringExtra("track")))))) {
-
-                    // clear the lyrics sheet
-                    title = "";
-                    lyrics = "";
-                    progressBar.setVisibility(View.VISIBLE);
-                    titleTV.setText("");
-                    lyricsTV.setText("");
-                    lyricsTV.setVisibility(View.INVISIBLE);
-                    refresh.setVisibility(View.GONE);
-
-                    artist = intent.getStringExtra("artist");
-                    track = intent.getStringExtra("track");
-
-                    for (Song song : songArrayList) {
-                        if ((song.getArtist().equalsIgnoreCase(artist)) && (song.getTrack().equalsIgnoreCase(track))) { // check if the song is present on the device
-
-                            lyrics = getLyrics(song); // gets the lyrics from the text file
-                            if (!lyrics.equals("")) {  // indicates we have offline lyrics available
-                                title = artist + " - " + track;
-                                lyricsTV.setText(lyrics);
-                                lyricsTV.setVisibility(View.VISIBLE);
-                                scrollView.fullScroll(ScrollView.FOCUS_UP);
-                                refresh.setVisibility(View.GONE);
-                                titleTV.setText(title);
-                                progressBar.setVisibility(View.GONE);
-                            } else { // offline lyrics not found, fetch them from the Internet
-                                lyricsTV.setText("");
-                                lyricsTV.setVisibility(View.INVISIBLE);
-                                artistU = artist.replaceAll(" ", "+");
-                                trackU = track.replaceAll(" ", "+");
-                                new FetchLyrics().execute();
-                                break;
-                            }
-                            offlineMusic = true;
-                        }
-                    }
-                    if (!offlineMusic) { // indicates that the song is being streamed
-                        if (cacheAll) {
-                            lyrics = getLyricsStreaming();
-                            if (!lyrics.equals("")) {
-                                title = artist + " - " + track;
-                                lyricsTV.setText(lyrics);
-                                lyricsTV.setVisibility(View.VISIBLE);
-                                scrollView.fullScroll(ScrollView.FOCUS_UP);
-                                refresh.setVisibility(View.GONE);
-                                titleTV.setText(title);
-                                progressBar.setVisibility(View.GONE);
-                            } else {
-                                artistU = artist.replaceAll(" ", "+");
-                                trackU = track.replaceAll(" ", "+");
-                                new FetchLyrics().execute();
-                            }
-                        } else {
-                            artistU = artist.replaceAll(" ", "+");
-                            trackU = track.replaceAll(" ", "+");
-                            new FetchLyrics().execute();
-                        }
-                    }
-
-                }
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-
-        }
-    };
 
     @Override
     @SuppressLint("NewApi")
@@ -165,6 +89,22 @@ public class LyricsService extends Service {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && (!Settings.canDrawOverlays(this) || !(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED))) {
             Toast.makeText(this, R.string.permissions_toast, Toast.LENGTH_SHORT).show();
+            return 0;
+        }
+        NotificationManager mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+
+        if (vibrator != null) { // this means the service is already running; so we just handle the intent and update the lyrics sheet
+            // make the notification persistent
+            mBuilder.setContentTitle("Lyrically")
+                    .setOngoing(true)
+                    .setContentIntent(pendingIntent)
+                    .setPriority(Notification.PRIORITY_MIN)
+                    .setSmallIcon(R.mipmap.ic_launcher);
+            mNotifyManager.notify(
+                    26181317,
+                    mBuilder.build());
+            handleIntent(intent);
             return 0;
         }
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -346,13 +286,10 @@ public class LyricsService extends Service {
 
         windowManager.addView(trigger, triggerParams);
 
-        NotificationManager mNotifyManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
 
-        Intent showLyrics = new Intent(this, ShowLyrics.class);
+        showLyrics = new Intent(this, ShowLyrics.class);
         showLyrics.putExtra("messenger", new Messenger(handler));
-        PendingIntent pendingIntent = PendingIntent.getService(this, 1, showLyrics, PendingIntent.FLAG_UPDATE_CURRENT);
+        pendingIntent = PendingIntent.getService(this, 1, showLyrics, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         mBuilder.setContentTitle("Lyrically")
@@ -364,18 +301,9 @@ public class LyricsService extends Service {
                 notifID,
                 mBuilder.build());
 
+        handleIntent(intent);
 
         checkForUpdates();
-
-        IntentFilter iF = new IntentFilter();
-        iF.addAction("com.spotify.music.metadatachanged");
-        iF.addAction("com.spotify.music.playbackstatechanged");
-        iF.addAction("com.android.music.metachanged");
-        iF.addAction("com.android.music.playstatechanged");
-        iF.addAction("com.jrtstudio.AnotherMusicPlayer.playstatechanged");
-        iF.addAction("com.jrtstudio.AnotherMusicPlayer.metachanged");
-        registerReceiver(musicReceiver, iF);
-
 
         return Service.START_STICKY;
     }
@@ -388,6 +316,75 @@ public class LyricsService extends Service {
         if (currentWeek != lastCheck) {
             startService(new Intent(this, UpdateService.class));
             sharedPreferences.edit().putInt("updateWeek", currentWeek).apply();
+        }
+    }
+
+    private void handleIntent(Intent intent) {
+        try {
+            // check if the song was changed by comparing the current artist and title with those received from the broadcast
+            if (!((artist.equalsIgnoreCase(intent.getStringExtra("artist")) && (track.equalsIgnoreCase(intent.getStringExtra("track")))))) {
+
+                // clear the lyrics sheet
+                title = "";
+                lyrics = "";
+                progressBar.setVisibility(View.VISIBLE);
+                titleTV.setText("");
+                lyricsTV.setText("");
+                lyricsTV.setVisibility(View.INVISIBLE);
+                refresh.setVisibility(View.GONE);
+
+                artist = intent.getStringExtra("artist");
+                track = intent.getStringExtra("track");
+
+                for (Song song : songArrayList) {
+                    if ((song.getArtist().equalsIgnoreCase(artist)) && (song.getTrack().equalsIgnoreCase(track))) { // check if the song is present on the device
+
+                        lyrics = getLyrics(song); // gets the lyrics from the text file
+                        if (!lyrics.equals("")) {  // indicates we have offline lyrics available
+                            title = artist + " - " + track;
+                            lyricsTV.setText(lyrics);
+                            lyricsTV.setVisibility(View.VISIBLE);
+                            scrollView.fullScroll(ScrollView.FOCUS_UP);
+                            refresh.setVisibility(View.GONE);
+                            titleTV.setText(title);
+                            progressBar.setVisibility(View.GONE);
+                        } else { // offline lyrics not found, fetch them from the Internet
+                            lyricsTV.setText("");
+                            lyricsTV.setVisibility(View.INVISIBLE);
+                            artistU = artist.replaceAll(" ", "+");
+                            trackU = track.replaceAll(" ", "+");
+                            new FetchLyrics().execute();
+                            break;
+                        }
+                        offlineMusic = true;
+                    }
+                }
+                if (!offlineMusic) { // indicates that the song is being streamed
+                    if (cacheAll) {
+                        lyrics = getLyricsStreaming();
+                        if (!lyrics.equals("")) {
+                            title = artist + " - " + track;
+                            lyricsTV.setText(lyrics);
+                            lyricsTV.setVisibility(View.VISIBLE);
+                            scrollView.fullScroll(ScrollView.FOCUS_UP);
+                            refresh.setVisibility(View.GONE);
+                            titleTV.setText(title);
+                            progressBar.setVisibility(View.GONE);
+                        } else {
+                            artistU = artist.replaceAll(" ", "+");
+                            trackU = track.replaceAll(" ", "+");
+                            new FetchLyrics().execute();
+                        }
+                    } else {
+                        artistU = artist.replaceAll(" ", "+");
+                        trackU = track.replaceAll(" ", "+");
+                        new FetchLyrics().execute();
+                    }
+                }
+
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
     }
 
@@ -427,7 +424,6 @@ public class LyricsService extends Service {
                 }
             });
             windowManager.removeView(trigger);
-            unregisterReceiver(musicReceiver);
         } catch (IllegalArgumentException | NullPointerException e) {
             e.printStackTrace();
         }

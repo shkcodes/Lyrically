@@ -40,6 +40,9 @@
                 <action android:name="com.android.music.playstatechanged" />
                 <action android:name="com.spotify.music.playbackstatechanged" />
                 <action android:name="com.jrtstudio.AnotherMusicPlayer.playstatechanged" />
+                <action android:name="com.android.music.metachanged" />
+                <action android:name="com.spotify.music.metadatachanged" />
+                <action android:name="com.jrtstudio.AnotherMusicPlayer.metachanged" />
             </intent-filter>
         </receiver>
 
@@ -49,7 +52,7 @@
         <service android:name=".DownloadService"/>
         <service android:name=".FetchLyrics" />
         <service android:name=".UpdateService" />
-
+        <service android:name=".StopService" />
 
 
     </application>

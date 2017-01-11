@@ -30,7 +30,7 @@
     <string name="download_prompt">Lyrics für %1$s Songs heruntergeladen?</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
-    <string name="please_wait">Bitte warten...</string>
+    <string name="please_wait">Bitte warten…</string>
     <string name="noLyricsFoundNotification">Hier klicken um die Songs zu sehen für welche keine Lyrics gefunden wurden</string>
 
 
