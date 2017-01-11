@@ -33,20 +33,20 @@
     <string name="please_wait">Bitte warten…</string>
     <string name="noLyricsFoundNotification">Hier klicken um die Songs zu sehen für welche keine Lyrics gefunden wurden</string>
 
-    <string name="trigger_settings_title">Trigger Settings</string>
-    <string name="trigger_pos_summary">The position of the area which detects the swipe</string>
+    <string name="trigger_settings_title">Trigger Einstellungen</string>
+    <string name="trigger_pos_summary">Die Position des Bereichs der das Wischen erkennt</string>
     <string name="trigger_pos_title">Trigger Position</string>
-    <string name="trigger_offset_summary">Trigger Offset</string>
-    <string name="trigger_swipe_direction_summary">The direction in which you swipe to see the lyrics</string>
-    <string name="trigger_swipe_direction_title">Swipe Direction</string>
-    <string name="trigger_width_summary">Trigger Width</string>
-    <string name="trigger_height_summary">Trigger Height</string>
-    <string name="trigger_vibration_summary">Enable or disable vibration on trigger detection</string>
+    <string name="trigger_offset_summary">Trigger Versatz</string>
+    <string name="trigger_swipe_direction_summary">Die Richtung in die du für das Anzeigen der Lyrics wischt</string>
+    <string name="trigger_width_summary">Trigger Breite</string>
+    <string name="trigger_height_summary">Trigger Höhe</string>
+    <string name="trigger_vibration_summary">Vibration beim Auslösen ein- oder ausschalten</string>
     <string name="trigger_vibration_title">Vibration</string>
-    <string name="lyrics_panel_settings_title">Lyrics Panel Settings</string>
-    <string name="lyrics_panel_height_summary">Lyrics Panel Height</string>
-    <string name="cache_settings_title">Caching</string>
-    <string name="cache_all_summary">Cache all the lyrics shown by Lyrically</string>
-    <string name="cache_all_title">Cache All</string>
+    <string name="lyrics_panel_settings_title">Lyrics Feld Einstellungen</string>
+    <string name="lyrics_panel_height_summary">Lyrics Feld Höhe</string>
+    <string name="cache_settings_title">Zwischenspeicher</string>
+    <string name="cache_all_summary">Alle angezeigten Lyrics zwischenspeichern</string>
+    <string name="cache_all_title">Alle zwischenspeichern</string>
+    <string name="trigger_swipe_direction_title">Wisch Richtung</string>
 
 </resources>
