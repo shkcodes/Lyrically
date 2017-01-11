@@ -33,5 +33,22 @@
     <string name="please_wait">Please wait…</string>
     <string name="noLyricsFoundNotification">Click here to see the songs whose lyrics were not found</string>
 
+    
+    <string name="trigger_settings_title">Trigger Settings</string>
+    <string name="trigger_pos_summary">The position of the area which detects the swipe</string>
+    <string name="trigger_pos_title">Trigger Position</string>
+    <string name="trigger_offset_summary">Trigger Offset</string>
+    <string name="trigger_swipe_direction_summary">The direction in which you swipe to see the lyrics</string>
+    <string name="trigger_swipe_direction_title">Swipe Direction</string>
+    <string name="trigger_width_summary">Trigger Width</string>
+    <string name="trigger_height_summary">Trigger Height</string>
+    <string name="trigger_vibration_summary">Enable or disable vibration on trigger detection</string>
+    <string name="trigger_vibration_title">Vibration</string>
+    <string name="lyrics_panel_settings_title">Lyrics Panel Settings</string>
+    <string name="lyrics_panel_height_summary">Lyrics Panel Height</string>
+    <string name="cache_settings_title">Caching</string>
+    <string name="cache_all_summary">Cache all the lyrics shown by Lyrically</string>
+    <string name="cache_all_title">Cache All</string>
+
 
 </resources>
