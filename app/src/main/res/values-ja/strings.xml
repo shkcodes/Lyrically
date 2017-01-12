@@ -33,20 +33,20 @@
     <string name="please_wait">お待ちください…</string>
     <string name="noLyricsFoundNotification">歌詞が見つからない曲を見るには、ここをクリックしてください</string>
 
-    <string name="trigger_settings_title">Trigger Settings</string>
-    <string name="trigger_pos_summary">The position of the area which detects the swipe</string>
-    <string name="trigger_pos_title">Trigger Position</string>
-    <string name="trigger_offset_summary">Trigger Offset</string>
-    <string name="trigger_swipe_direction_summary">The direction in which you swipe to see the lyrics</string>
-    <string name="trigger_swipe_direction_title">Swipe Direction</string>
-    <string name="trigger_width_summary">Trigger Width</string>
-    <string name="trigger_height_summary">Trigger Height</string>
-    <string name="trigger_vibration_summary">Enable or disable vibration on trigger detection</string>
-    <string name="trigger_vibration_title">Vibration</string>
-    <string name="lyrics_panel_settings_title">Lyrics Panel Settings</string>
-    <string name="lyrics_panel_height_summary">Lyrics Panel Height</string>
-    <string name="cache_settings_title">Caching</string>
-    <string name="cache_all_summary">Cache all the lyrics shown by Lyrically</string>
-    <string name="cache_all_title">Cache All</string>
+    <string name="trigger_settings_title">トリガー設定</string>
+    <string name="trigger_pos_summary">スワイプを検出する領域の位置</string>
+    <string name="trigger_pos_title">トリガー位置</string>
+    <string name="trigger_offset_summary">トリガーオフセット</string>
+    <string name="trigger_swipe_direction_summary">歌詞を見るためにスワイプする方向</string>
+    <string name="trigger_swipe_direction_title">スワイプの方向</string>
+    <string name="trigger_width_summary">トリガーの幅</string>
+    <string name="trigger_height_summary">トリガーの高さ</string>
+    <string name="trigger_vibration_summary">トリガー検出時の振動を有効または無効にします</string>
+    <string name="trigger_vibration_title">バイブレーション</string>
+    <string name="lyrics_panel_settings_title">歌詞パネル設定</string>
+    <string name="lyrics_panel_height_summary">歌詞パネルの高さ</string>
+    <string name="cache_settings_title">キャッシュ</string>
+    <string name="cache_all_summary">Lyrically が表示する歌詞をすべてキャッシュします</string>
+    <string name="cache_all_title">すべてキャッシュ</string>
 
 </resources>
