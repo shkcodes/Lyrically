@@ -3,8 +3,8 @@
 
 
     <string-array name="triggerPos">
-        <item>Left</item>
-        <item>Right</item>
+        <item>Links</item>
+        <item>Rechts</item>
     </string-array>
 
     <string-array name="triggerPosValues">
@@ -14,10 +14,10 @@
 
 
     <string-array name="triggerSwipeDirection">
-        <item>Up</item>
-        <item>Down</item>
-        <item>Left</item>
-        <item>Right</item>
+        <item>Hoch</item>
+        <item>Runter</item>
+        <item>Links</item>
+        <item>Rechts</item>
     </string-array>
 
     <string-array name="triggerSwipeDirectionValues">
