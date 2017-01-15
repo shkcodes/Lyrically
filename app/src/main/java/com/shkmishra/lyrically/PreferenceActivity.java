@@ -4,7 +4,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -12,9 +11,6 @@ import android.view.MenuItem;
 
 
 public class PreferenceActivity extends AppCompatActivity {
-
-    boolean isMusicPlaying;
-    AudioManager audioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,19 +40,12 @@ public class PreferenceActivity extends AppCompatActivity {
         super.onPause();
         Intent intent = new Intent(this, PreferenceTrigger.class);
         stopService(intent);
-        if (isMusicPlaying) {
-            Intent intent1 = new Intent(this, LyricsService.class);
-            startService(intent1);
-        }
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        isMusicPlaying = audioManager.isMusicActive(); // if music was playing when this activity was started, start the LyricsService on exit
-
         Intent intent = new Intent(this, PreferenceTrigger.class);
         startService(intent);
 
