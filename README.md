@@ -29,6 +29,8 @@ I have plans to make it work with many other music players in the future.
 
 ## [How to use](https://www.youtube.com/watch?v=g0XidfCGZHU)
 
-## [Download](https://github.com/shkcodes/Lyrically/releases)
+## Downloads
+* [Github](https://github.com/shkcodes/Lyrically/releases)
+* [F-Droid](https://f-droid.org/repository/browse/?fdid=com.shkmishra.lyrically)
 
 ## [Icons](http://www.flaticon.com/)
