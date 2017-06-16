@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">Lyrically</string>
+    <string name="menuSettings">Impostazioni</string>
+    <string name="downloadingLyrics">Scarico i testi</string>
+    <string name="lyricsDownloaded">Testi scaricati</string>
+    <string name="noLyricsFound">Nessun testo trovato</string>
+
+
+    <string name="download">Download</string>
+    <string name="downloadHelp">Scarica i testi per l\'uso offline</string>
+
+
+    <string name="tutorial">Guida</string>
+    <string name="tutorialHelp">Impara ad usare l\'app</string>
+
+
+    <string name="source">Sorgenti</string>
+    <string name="sourceHelp">Visualizza le sorgenti dell\'app</string>
+
+
+    <string name="about">Altre app</string>
+    <string name="aboutHelp">Prova le mie app</string>
+    <string name="lyricsHint">I tuoi testi appariranno qui</string>
+    <string name="updateTitle">Aggiornamento disponibile</string>
+    <string name="updateText">Premi qui per aggiornare</string>
+    <string name="draw_over_other_apps">Sovrapposizione</string>
+    <string name="read_write_storage">Accesso alla memoria</string>
+    <string name="permissions_toast">Lyrically - Dai i permessi per continuare</string>
+    <string name="permissions_needed">Permessi richiesti</string>
+    <string name="download_prompt">Scaricare i testi per %1$s canzoni?</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+    <string name="please_wait">Attendi...</string>
+    <string name="noLyricsFoundNotification">Premi qui per vedere i testi non trovati</string>
+
+    
+    <string name="trigger_settings_title">Settaggi trigger</string>
+    <string name="trigger_pos_summary">La posizione dell\'area che riconosce lo swipe</string>
+    <string name="trigger_pos_title">Posizione del trigger</string>
+    <string name="trigger_offset_summary">Offset del trigger</string>
+    <string name="trigger_swipe_direction_summary">Direzione dello swipe per aprire la finestra dei testi</string>
+    <string name="trigger_swipe_direction_title">Direzione swipe</string>
+    <string name="trigger_width_summary">Larghezza trigger</string>
+    <string name="trigger_height_summary">Altezza trigger</string>
+    <string name="trigger_vibration_summary">Abilita la vibrazione se il trigger viene azionato</string>
+    <string name="trigger_vibration_title">Vibrazione</string>
+    <string name="lyrics_panel_settings_title">Settaggi pannello testi</string>
+    <string name="lyrics_panel_height_summary">Altezza pannello testi</string>
+    <string name="cache_settings_title">Memorizzazione</string>
+    <string name="cache_all_summary">Memorizza tutti i testi mostrati</string>
+    <string name="cache_all_title">Memorizzali tutti</string>
+
+
+</resources>
