@@ -615,7 +615,7 @@ public class LyricsService extends Service {
                         }
 
                         element = document.select("div[class=song_body-lyrics]").first();
-                        temp = element.toString().substring(0, element.toString().indexOf("</lyrics>"));
+                        temp = element.toString().substring(0, element.toString().indexOf("<!--/sse-->"));
                     } else {
 
                         url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics.wikia+" + trackU + "+" + artistU, "UTF-8");
