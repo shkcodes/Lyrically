@@ -70,6 +70,7 @@ public class LyricsService extends Service {
     ProgressBar progressBar;
     int notifID = 26181317;
     ArrayList<Song> songArrayList = new ArrayList<>();
+    private final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36";
 
     SharedPreferences sharedPreferences;
     WindowManager.LayoutParams triggerParams, lyricsPanelParams;
@@ -80,6 +81,7 @@ public class LyricsService extends Service {
     private WindowManager windowManager;
     Intent showLyrics;
     PendingIntent pendingIntent;
+    FetchLyrics fetchLyrics;
 
 
     @Override
@@ -319,41 +321,47 @@ public class LyricsService extends Service {
         }
     }
 
+    //####
     private void handleIntent(Intent intent) {
         try {
             // check if the song was changed by comparing the current artist and title with those received from the broadcast
-            if (!((artist.equalsIgnoreCase(intent.getStringExtra("artist")) && (track.equalsIgnoreCase(intent.getStringExtra("track")))))) {
+            if (!artist.equalsIgnoreCase(intent.getStringExtra("artist")) || !track.equalsIgnoreCase(intent.getStringExtra("track"))) {
 
                 // clear the lyrics sheet
-                title = "";
                 lyrics = "";
                 progressBar.setVisibility(View.VISIBLE);
                 titleTV.setText("");
                 lyricsTV.setText("");
                 lyricsTV.setVisibility(View.INVISIBLE);
                 refresh.setVisibility(View.GONE);
+                offlineMusic = false;
 
                 artist = intent.getStringExtra("artist");
                 track = intent.getStringExtra("track");
+                title = artist + " - " + track;
+
+                titleTV.setText(title);
+
 
                 for (Song song : songArrayList) {
                     if ((song.getArtist().equalsIgnoreCase(artist)) && (song.getTrack().equalsIgnoreCase(track))) { // check if the song is present on the device
-
                         lyrics = getLyrics(song); // gets the lyrics from the text file
                         if (!lyrics.equals("")) {  // indicates we have offline lyrics available
-                            title = artist + " - " + track;
                             lyricsTV.setText(lyrics);
                             lyricsTV.setVisibility(View.VISIBLE);
                             scrollView.fullScroll(ScrollView.FOCUS_UP);
                             refresh.setVisibility(View.GONE);
-                            titleTV.setText(title);
                             progressBar.setVisibility(View.GONE);
+
                         } else { // offline lyrics not found, fetch them from the Internet
                             lyricsTV.setText("");
                             lyricsTV.setVisibility(View.INVISIBLE);
                             artistU = artist.replaceAll(" ", "+");
                             trackU = track.replaceAll(" ", "+");
-                            new FetchLyrics().execute();
+                            if (fetchLyrics != null && fetchLyrics.getStatus() == AsyncTask.Status.RUNNING)
+                                fetchLyrics.cancel(true);
+                            fetchLyrics = new FetchLyrics();
+                            fetchLyrics.execute();
                             break;
                         }
                         offlineMusic = true;
@@ -363,22 +371,26 @@ public class LyricsService extends Service {
                     if (cacheAll) {
                         lyrics = getLyricsStreaming();
                         if (!lyrics.equals("")) {
-                            title = artist + " - " + track;
                             lyricsTV.setText(lyrics);
                             lyricsTV.setVisibility(View.VISIBLE);
                             scrollView.fullScroll(ScrollView.FOCUS_UP);
                             refresh.setVisibility(View.GONE);
-                            titleTV.setText(title);
                             progressBar.setVisibility(View.GONE);
                         } else {
                             artistU = artist.replaceAll(" ", "+");
                             trackU = track.replaceAll(" ", "+");
-                            new FetchLyrics().execute();
+                            if (fetchLyrics != null && fetchLyrics.getStatus() == AsyncTask.Status.RUNNING)
+                                fetchLyrics.cancel(true);
+                            fetchLyrics = new FetchLyrics();
+                            fetchLyrics.execute();
                         }
                     } else {
                         artistU = artist.replaceAll(" ", "+");
                         trackU = track.replaceAll(" ", "+");
-                        new FetchLyrics().execute();
+                        if (fetchLyrics != null && fetchLyrics.getStatus() == AsyncTask.Status.RUNNING)
+                            fetchLyrics.cancel(true);
+                        fetchLyrics = new FetchLyrics();
+                        fetchLyrics.execute();
                     }
                 }
 
@@ -497,6 +509,8 @@ public class LyricsService extends Service {
             if ((song.getArtist().equalsIgnoreCase(artist)) && (song.getTrack().equalsIgnoreCase(track))) {
                 File path = new File(Environment.getExternalStorageDirectory() + File.separator + "Lyrically/");
                 File lyricsFile = new File(path, song.getId() + ".txt");
+                if (lyricsFile.exists())
+                    return;
                 try {
                     FileWriter fileWriter = new FileWriter(lyricsFile);
                     fileWriter.write(lyrics);
@@ -546,6 +560,8 @@ public class LyricsService extends Service {
 
         File path = new File(Environment.getExternalStorageDirectory() + File.separator + "Lyrically/");
         File lyricsFile = new File(path, fileName + ".txt");
+        if (lyricsFile.exists())
+            return;
         try {
             FileWriter fileWriter = new FileWriter(lyricsFile);
             fileWriter.write(lyrics);
@@ -556,18 +572,13 @@ public class LyricsService extends Service {
         }
     }
 
-
     // fetches the lyrics from the Internet
-    class FetchLyrics extends AsyncTask {
-
-        boolean found = true;
+    class FetchLyrics extends AsyncTask<Void, Void, Void> {
 
         String url = "s", lyricURL = "s";
 
-
         @Override
-        protected Object doInBackground(Object[] params) {
-
+        protected Void doInBackground(Void... params) {
             /*
             Currently using 3 providers : azlyrics, genius and lyrics.wikia; in that order
             Procedure :
@@ -576,7 +587,6 @@ public class LyricsService extends Service {
              */
 
             try {
-
                 url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics+azlyrics+" + artistU + "+" + trackU, "UTF-8"); // Google URL
                 Document document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
                 Element results = document.select("h3.r > a").first();
@@ -586,14 +596,12 @@ public class LyricsService extends Service {
                 String temp;
 
                 if (lyricURL.contains("azlyrics.com/lyrics")) { // checking if from the provider we wanted
-                    document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
-                    title = artist + " - " + track;
+                    document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get();
                     String page = document.toString();
 
                     page = page.substring(page.indexOf("that. -->") + 9);
                     page = page.substring(0, page.indexOf("</div>"));
                     temp = page;
-
                 } else {
 
                     url = "https://www.google.com/search?q=" + URLEncoder.encode("genius+" + artistU + "+" + trackU + "lyrics", "UTF-8");
@@ -602,14 +610,11 @@ public class LyricsService extends Service {
                     results = document.select("h3.r > a").first();
                     lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"));
 
-
                     if (lyricURL.contains("genius")) {
 
-                        document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
-                        title = document.select("meta[property=og:title]").first().attr("content");
+                        document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get();
 
                         Elements selector = document.select("div.h2");
-
                         for (Element e : selector) {
                             e.remove();
                         }
@@ -619,18 +624,12 @@ public class LyricsService extends Service {
                     } else {
 
                         url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics.wikia+" + trackU + "+" + artistU, "UTF-8");
-
-
                         document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get();
 
                         results = document.select("h3.r > a").first();
                         lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"));
 
-
-                        document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
-                        title = document.select("meta[property=og:title]").first().attr("content");
-                        title = title.replace(":", " - ");
-
+                        document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get();
                         element = document.select("div[class=lyricbox]").first();
                         temp = element.toString();
 
@@ -640,7 +639,6 @@ public class LyricsService extends Service {
                 }
 
                 // preserving line breaks
-
                 temp = temp.replaceAll("(?i)<br[^>]*>", "br2n");
                 temp = temp.replaceAll("]", "]shk");
                 temp = temp.replaceAll("\\[", "shk[");
@@ -652,25 +650,16 @@ public class LyricsService extends Service {
                 if (lyricURL.contains("genius"))
                     lyrics = lyrics.substring(lyrics.indexOf("Lyrics") + 6);
 
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
-                found = false;
+            } catch (Exception e) {
+                lyrics = "";
             }
             return null;
         }
 
-
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            if (!found || !(lyrics.length() > 0)) { // if no lyrics found
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (!(lyrics.length() > 0)) { // if no lyrics found
                 lyricsTV.setText("");
                 lyricsTV.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.GONE);
@@ -679,8 +668,10 @@ public class LyricsService extends Service {
                 refresh.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
-                        new FetchLyrics().execute();
+                        if (fetchLyrics != null && fetchLyrics.getStatus() == AsyncTask.Status.RUNNING)
+                            fetchLyrics.cancel(true);
+                        fetchLyrics = new FetchLyrics();
+                        fetchLyrics.execute();
                         progressBar.setVisibility(View.VISIBLE);
                     }
                 });
@@ -691,15 +682,13 @@ public class LyricsService extends Service {
             refresh.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
             scrollView.fullScroll(ScrollView.FOCUS_UP);
-            titleTV.setText(title);
             lyricsTV.setText(lyrics);
             if (lyricsTV.getVisibility() != View.VISIBLE)
                 lyricsTV.setVisibility(View.VISIBLE);
 
-            if (offlineMusic) saveLyricsOffline(lyrics); // store the lyrics in a text file
-            else if (cacheAll) saveLyricsStreaming(lyrics);
+            saveLyricsOffline(lyrics); // store the lyrics in a text file
+            if (cacheAll) saveLyricsStreaming(lyrics);
 
-            super.onPostExecute(o);
         }
     }
 
