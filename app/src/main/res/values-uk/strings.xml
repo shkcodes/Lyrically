@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">Lyrically</string>
+    <string name="menuSettings">Налаштування</string>
+    <string name="downloadingLyrics">Завантаження текстів</string>
+    <string name="lyricsDownloaded">Тексти Завантажені</string>
+    <string name="noLyricsFound">Тексти не знайдені</string>
+
+
+    <string name="download">Завантажити</string>
+    <string name="downloadHelp">Завантажити тексти для використання оффлайн</string>
+
+
+    <string name="tutorial">Посібник</string>
+    <string name="tutorialHelp">Навчіться як використовувати цей застосунок</string>
+
+
+    <string name="source">Першокод</string>
+    <string name="sourceHelp">Дивитись код цього застосунку</string>
+
+
+    <string name="about">Інші Застосунки</string>
+    <string name="aboutHelp">Мої інші застосунки</string>
+    <string name="lyricsHint">Ваші тексти з\'являться тут</string>
+    <string name="updateTitle">Доступне оновлення</string>
+    <string name="updateText">Натисніть тут, щоб оновити</string>
+    <string name="draw_over_other_apps">ВІДОБРАЖАТИ ПОВЕРХ ІНШИХ ДОДАТКІВ</string>
+    <string name="read_write_storage">ЧИТАННЯ / ЗБЕРІГАННЯ СХОВИЩА ДАНИХ</string>
+    <string name="permissions_toast">Lyrically - Будь ласка, надайте відповідні дозволи</string>
+    <string name="permissions_needed">Необхідні Дозволи</string>
+    <string name="download_prompt">Завантажити тексти для %1$s пісень?</string>
+    <string name="yes">Так</string>
+    <string name="no">Ні</string>
+    <string name="please_wait">Будь ласка, зачекайте…</string>
+    <string name="noLyricsFoundNotification">Натисніть тут, щоб побачити пісні, чиї тексти не було знайдено</string>
+
+    
+    <string name="trigger_settings_title">Налаштування тригера</string>
+    <string name="trigger_pos_summary">Положення області, яка виявляє прокручування (свайп)</string>
+    <string name="trigger_pos_title">Позиція тригера</string>
+    <string name="trigger_offset_summary">Тригерний зсув</string>
+    <string name="trigger_swipe_direction_summary">Напрямок, в якому ви проведете пальцем, щоб побачити тексти пісень</string>
+    <string name="trigger_swipe_direction_title">Напрям проведення</string>
+    <string name="trigger_width_summary">Ширина тригера</string>
+    <string name="trigger_height_summary">Висота тригера</string>
+    <string name="trigger_vibration_summary">Увімкнення або вимкнення вібрації на виявленні тригера</string>
+    <string name="trigger_vibration_title">Вібрація</string>
+    <string name="lyrics_panel_settings_title">Параметри панелі тексту</string>
+    <string name="lyrics_panel_height_summary">Висота панелі тексту</string>
+    <string name="cache_settings_title">Кешування</string>
+    <string name="cache_all_summary">Кешувати всі тексти, показані Lyrically</string>
+    <string name="cache_all_title">Кешувати все</string>
+
+
+</resources>
