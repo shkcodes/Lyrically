@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <string-array name="triggerPos">
+        <item>Ліво</item>
+        <item>Право</item>
+    </string-array>
+
+    <string-array name="triggerPosValues">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+
+    <string-array name="triggerSwipeDirection">
+        <item>Уверх</item>
+        <item>Униз</item>
+        <item>Уліво</item>
+        <item>Управо</item>
+    </string-array>
+
+    <string-array name="triggerSwipeDirectionValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+
+</resources>
