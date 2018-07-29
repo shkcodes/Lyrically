@@ -10,8 +10,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
@@ -91,7 +91,7 @@ public class LyricsService extends Service {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && (!Settings.canDrawOverlays(this) || !(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED))) {
             Toast.makeText(this, R.string.permissions_toast, Toast.LENGTH_SHORT).show();
-            return 0;
+            return START_STICKY;
         }
         NotificationManager mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
@@ -107,7 +107,7 @@ public class LyricsService extends Service {
                     26181317,
                     mBuilder.build());
             handleIntent(intent);
-            return 0;
+            return START_STICKY;
         }
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -185,7 +185,11 @@ public class LyricsService extends Service {
         titleTV = (TextView) bottomLayout.findViewById(R.id.title);
         lyricsTV = (TextView) bottomLayout.findViewById(R.id.lyrics);
         progressBar = (ProgressBar) bottomLayout.findViewById(R.id.progressbar);
-        progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_IN);
+
+        lyricsTV.setTextColor(Color.parseColor(sharedPreferences.getString("lyricsTextColor", "#FFFFFF")));
+        titleTV.setTextColor(Color.parseColor(sharedPreferences.getString("songTitleColor", "#fd5622")));
+        bottomLayout.findViewById(R.id.content).setBackgroundColor(Color.parseColor(sharedPreferences.getString("panelColor", "#383F47")));
+        progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(sharedPreferences.getString("songTitleColor", "#fd5622")), android.graphics.PorterDuff.Mode.SRC_IN);
         refresh = (ImageView) bottomLayout.findViewById(R.id.refresh);
 
         // swipe listener to dismiss the lyrics panel

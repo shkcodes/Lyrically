@@ -20,6 +20,7 @@
 
     <string name="about">Other Apps</string>
     <string name="aboutHelp">Check out my other apps</string>
+    <string name="songTitleHint">Song Artist - Song Title</string>
     <string name="lyricsHint">Your lyrics will appear here</string>
     <string name="updateTitle">Update available</string>
     <string name="updateText">Click here to update</string>
@@ -33,7 +34,7 @@
     <string name="please_wait">Please wait…</string>
     <string name="noLyricsFoundNotification">Click here to see the songs whose lyrics were not found</string>
 
-    
+
     <string name="trigger_settings_title">Trigger Settings</string>
     <string name="trigger_pos_summary">The position of the area which detects the swipe</string>
     <string name="trigger_pos_title">Trigger Position</string>
@@ -50,5 +51,9 @@
     <string name="cache_all_summary">Cache all the lyrics shown by Lyrically</string>
     <string name="cache_all_title">Cache All</string>
 
+    <string name="color_settings_title">Color Settings</string>
+    <string name="color_lyrics_panel">Lyrics Panel</string>
+    <string name="color_song_title">Song Title</string>
+    <string name="color_lyrics">Lyrics Text</string>
 
 </resources>

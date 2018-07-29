@@ -3,6 +3,7 @@ package com.shkmishra.lyrically;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
 import android.os.Vibrator;
@@ -17,6 +18,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 /*
@@ -101,7 +103,19 @@ public class PreferenceTrigger extends Service {
 
         bottomLayout = layoutInflater.inflate(R.layout.lyrics_sheet, null);
         TextView titleTV = (TextView) bottomLayout.findViewById(R.id.title);
-        titleTV.setText(getResources().getString(R.string.lyricsHint));
+        titleTV.setText(getResources().getString(R.string.songTitleHint));
+        titleTV.setTextColor(Color.parseColor(sharedPreferences.getString("songTitleColor", "#fd5622")));
+
+        bottomLayout.findViewById(R.id.content).setBackgroundColor(Color.parseColor(sharedPreferences.getString("panelColor", "#383F47")));
+
+        ProgressBar progressBar = (ProgressBar) bottomLayout.findViewById(R.id.progressbar);
+        progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(sharedPreferences.getString("songTitleColor", "#fd5622")), android.graphics.PorterDuff.Mode.SRC_IN);
+
+        TextView lyricsTV = (TextView) bottomLayout.findViewById(R.id.lyrics);
+        lyricsTV.setText(getResources().getString(R.string.lyricsHint));
+        lyricsTV.setVisibility(View.VISIBLE);
+        lyricsTV.setTextColor(Color.parseColor(sharedPreferences.getString("lyricsTextColor", "#FFFFFF")));
+
 
         bottomLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         bottomLayout.setOnTouchListener(new SwipeDismissTouchListener(bottomLayout, null, new SwipeDismissTouchListener.DismissCallbacks() {

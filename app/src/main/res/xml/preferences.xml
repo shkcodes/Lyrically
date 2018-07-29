@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+    <PreferenceCategory android:title="@string/color_settings_title">
+
+        <com.shkmishra.lyrically.ColorPickerPreference
+            android:defaultValue="#383F47"
+            android:key="panelColor"
+            android:title="@string/color_lyrics_panel" />
+        <com.shkmishra.lyrically.ColorPickerPreference
+            android:defaultValue="#fd5622"
+            android:key="songTitleColor"
+            android:title="@string/color_song_title" />
+        <com.shkmishra.lyrically.ColorPickerPreference
+            android:defaultValue="#FFFFFF"
+            android:key="lyricsTextColor"
+            android:title="@string/color_lyrics" />
+    </PreferenceCategory>
+
     <PreferenceCategory
         android:title="@string/trigger_settings_title">
         <ListPreference
