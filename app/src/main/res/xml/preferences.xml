@@ -18,11 +18,10 @@
             android:title="@string/color_lyrics" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/trigger_settings_title">
+    <PreferenceCategory android:title="@string/trigger_settings_title">
         <ListPreference
             android:defaultValue="1"
-        android:entries="@array/triggerPos"
+            android:entries="@array/triggerPos"
             android:entryValues="@array/triggerPosValues"
             android:key="triggerPos"
             android:summary="@string/trigger_pos_summary"
@@ -31,7 +30,7 @@
         <com.shkmishra.lyrically.SeekBarPreference
             android:defaultValue="10"
             android:key="triggerOffset"
-            android:summary="@string/trigger_offset_summary"/>
+            android:summary="@string/trigger_offset_summary" />
 
         <ListPreference
             android:defaultValue="1"
@@ -44,13 +43,13 @@
         <com.shkmishra.lyrically.SeekBarPreference
             android:defaultValue="75"
             android:key="triggerWidth"
-            android:summary="@string/trigger_width_summary"/>
+            android:summary="@string/trigger_width_summary" />
 
 
         <com.shkmishra.lyrically.SeekBarPreference
             android:defaultValue="75"
             android:key="triggerHeight"
-            android:summary="@string/trigger_height_summary"/>
+            android:summary="@string/trigger_height_summary" />
 
 
         <CheckBoxPreference
@@ -61,14 +60,13 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/lyrics_panel_settings_title">
+    <PreferenceCategory android:title="@string/lyrics_panel_settings_title">
 
 
         <com.shkmishra.lyrically.SeekBarPreference2
             android:defaultValue="60"
             android:key="panelHeight"
-            android:summary="@string/lyrics_panel_height_summary"/>
+            android:summary="@string/lyrics_panel_height_summary" />
 
 
     </PreferenceCategory>
@@ -80,6 +78,16 @@
             android:key="cacheAll"
             android:summary="@string/cache_all_summary"
             android:title="@string/cache_all_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/update_settings_title">
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="checkForUpdates"
+            android:summary="@string/check_updates_summary"
+            android:title="@string/check_updates_title" />
 
     </PreferenceCategory>
 

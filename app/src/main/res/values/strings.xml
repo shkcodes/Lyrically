@@ -56,4 +56,8 @@
     <string name="color_song_title">Song Title</string>
     <string name="color_lyrics">Lyrics Text</string>
 
+    <string name="update_settings_title">Updates</string>
+    <string name="check_updates_title">Check For Updates</string>
+    <string name="check_updates_summary">Lyrically will check for updates once a week</string>
+
 </resources>

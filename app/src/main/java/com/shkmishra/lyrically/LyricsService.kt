@@ -278,7 +278,8 @@ class LyricsService : Service() {
 
         handleIntent(intent)
 
-        checkForUpdates()
+        if (sharedPreferences.getBoolean("checkForUpdates", true))
+            checkForUpdates()
 
         return Service.START_STICKY
     }

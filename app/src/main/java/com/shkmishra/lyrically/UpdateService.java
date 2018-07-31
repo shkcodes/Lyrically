@@ -32,7 +32,7 @@ public class UpdateService extends IntentService {
             String currentVersion = pInfo.versionName; // get the installed version
 
             Document document = Jsoup.connect("https://github.com/shkcodes/Lyrically/releases").userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").get();
-            Element element = document.select("ul[class=tag-references]").first();
+            Element element = document.select("ul[class=tag-references mt-2]").first();
             String latestVersion = element.select("span[class=css-truncate-target]").first().text(); // get the latest version
 
             // show update notification if these versions mismatch
