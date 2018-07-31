@@ -16,6 +16,7 @@ import android.preference.PreferenceManager
 import android.provider.MediaStore
 import android.provider.Settings
 import android.support.v4.widget.NestedScrollView
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.NotificationCompat
 import android.util.DisplayMetrics
 import android.view.*
@@ -163,6 +164,16 @@ class LyricsService : Service() {
         bottomLayout.findViewById(R.id.content).setBackgroundColor(Color.parseColor(sharedPreferences.getString("panelColor", "#383F47")))
         progressBar.indeterminateDrawable.setColorFilter(Color.parseColor(sharedPreferences.getString("songTitleColor", "#fd5622")), android.graphics.PorterDuff.Mode.SRC_IN)
         refresh = bottomLayout.findViewById(R.id.refresh) as ImageView
+        val swipeRefreshLayout = bottomLayout.findViewById(R.id.swipeRefresh) as SwipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            lyricsTV.text = ""
+            lyricsTV.visibility = View.INVISIBLE
+            artistU = artist.replace(" ".toRegex(), "+")
+            trackU = track.replace(" ".toRegex(), "+")
+            if (asyncJob != null && asyncJob!!.isActive) asyncJob?.cancel()
+            fetchLyricsAsync()
+        }
 
         // swipe listener to dismiss the lyrics panel
         bottomLayout.setOnTouchListener(SwipeDismissTouchListener(bottomLayout, Any(), object : SwipeDismissTouchListener.DismissCallbacks {
@@ -479,8 +490,6 @@ class LyricsService : Service() {
             if (song.artist.equals(artist, ignoreCase = true) && song.track.equals(track, ignoreCase = true)) {
                 val path = File(Environment.getExternalStorageDirectory().toString() + File.separator + "Lyrically/")
                 val lyricsFile = File(path, song.id.toString() + ".txt")
-                if (lyricsFile.exists())
-                    return
                 try {
                     val fileWriter = FileWriter(lyricsFile)
                     fileWriter.write(lyrics)
