@@ -263,7 +263,7 @@ class LyricsService : Service() {
 
 
         val showLyrics = Intent(this, ShowLyrics::class.java)
-        showLyrics?.putExtra("messenger", Messenger(handler))
+        showLyrics.putExtra("messenger", Messenger(handler))
         pendingIntent = PendingIntent.getService(this, 1, showLyrics, PendingIntent.FLAG_UPDATE_CURRENT)
 
 
@@ -297,6 +297,7 @@ class LyricsService : Service() {
 
     //####
     private fun handleIntent(intent: Intent) {
+        if (asyncJob != null && asyncJob!!.isActive) asyncJob?.cancel()
         try {
             // check if the song was changed by comparing the current artist and title with those received from the broadcast
             if (!artist.equals(intent.getStringExtra("artist"), ignoreCase = true) || !track.equals(intent.getStringExtra("track"), ignoreCase = true)) {
@@ -332,7 +333,6 @@ class LyricsService : Service() {
                             lyricsTV.visibility = View.INVISIBLE
                             artistU = artist.replace(" ".toRegex(), "+")
                             trackU = track.replace(" ".toRegex(), "+")
-                            if (asyncJob != null && asyncJob!!.isActive) asyncJob?.cancel()
                             fetchLyricsAsync()
                             break
                         }
@@ -351,13 +351,11 @@ class LyricsService : Service() {
                         } else {
                             artistU = artist.replace(" ".toRegex(), "+")
                             trackU = track.replace(" ".toRegex(), "+")
-                            if (asyncJob != null && asyncJob!!.isActive) asyncJob?.cancel()
                             fetchLyricsAsync()
                         }
                     } else {
                         artistU = artist.replace(" ".toRegex(), "+")
                         trackU = track.replace(" ".toRegex(), "+")
-                        if (asyncJob != null && asyncJob!!.isActive) asyncJob?.cancel()
                         fetchLyricsAsync()
                     }
                 }
