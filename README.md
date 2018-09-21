@@ -5,11 +5,7 @@
 <img src="https://github.com/shkcodes/Lyrically/blob/master/screenshots/screenshot3.png" alt="alt text" height="640">
 <img src="https://github.com/shkcodes/Lyrically/blob/master/screenshots/screenshot4.png" alt="alt text" height="640">
 
-
-
-
 An everywhere lyrics app which can be used by simply swiping a part of your screen. See the lyrics without interrupting what you're doing.
-
 
 ## Supported Apps 
 * Google Play Music
@@ -20,17 +16,16 @@ An everywhere lyrics app which can be used by simply swiping a part of your scre
 * BlackPlayer
 * Rocket Player
 
-
-
-
 I have plans to make it work with many other music players in the future.
 
+## How to use
 
-
-## [How to use](https://www.youtube.com/watch?v=g0XidfCGZHU)
+https://www.youtube.com/watch?v=g0XidfCGZHU
 
 ## Downloads
-* [Github](https://github.com/shkcodes/Lyrically/releases)
-* [F-Droid](https://f-droid.org/repository/browse/?fdid=com.shkmishra.lyrically)
 
-## [Icons](http://www.flaticon.com/)
+* [Github](https://github.com/shkcodes/Lyrically/releases)
+* [F-Droid](https://f-droid.org/packages/com.shkmishra.lyrically)
+
+## Icons
+https://www.flaticon.com
