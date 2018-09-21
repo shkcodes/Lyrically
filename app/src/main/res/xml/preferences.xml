@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-
     <PreferenceCategory android:title="@string/color_settings_title">
 
         <com.shkmishra.lyrically.ColorPickerPreference
@@ -45,12 +44,10 @@
             android:key="triggerWidth"
             android:summary="@string/trigger_width_summary" />
 
-
         <com.shkmishra.lyrically.SeekBarPreference
             android:defaultValue="75"
             android:key="triggerHeight"
             android:summary="@string/trigger_height_summary" />
-
 
         <CheckBoxPreference
             android:defaultValue="true"
@@ -62,15 +59,12 @@
 
     <PreferenceCategory android:title="@string/lyrics_panel_settings_title">
 
-
         <com.shkmishra.lyrically.SeekBarPreference2
             android:defaultValue="60"
             android:key="panelHeight"
             android:summary="@string/lyrics_panel_height_summary" />
 
-
     </PreferenceCategory>
-
 
     <PreferenceCategory android:title="@string/cache_settings_title">
 

@@ -1,8 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Lyrically</string>
     <string name="menuSettings">Settings</string>
-    <string name="downloadingLyrics">Downloading lyrics</string>
-    <string name="lyricsDownloaded">Lyrics Downloaded</string>
+    <string name="downloadingLyrics">Downloading lyrics…</string>
+    <string name="lyricsDownloaded">Lyrics downloaded</string>
     <string name="noLyricsFound">No lyrics found</string>
 
 
@@ -34,12 +35,11 @@
     <string name="please_wait">Please wait…</string>
     <string name="noLyricsFoundNotification">Click here to see the songs whose lyrics were not found</string>
 
-
     <string name="trigger_settings_title">Trigger Settings</string>
     <string name="trigger_pos_summary">The position of the area which detects the swipe</string>
     <string name="trigger_pos_title">Trigger Position</string>
     <string name="trigger_offset_summary">Trigger Offset</string>
-    <string name="trigger_swipe_direction_summary">The direction in which you swipe to see the lyrics</string>
+    <string name="trigger_swipe_direction_summary">The direction you swipe to see the lyrics</string>
     <string name="trigger_swipe_direction_title">Swipe Direction</string>
     <string name="trigger_width_summary">Trigger Width</string>
     <string name="trigger_height_summary">Trigger Height</string>

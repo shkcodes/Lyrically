@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    
 
     <application
         android:allowBackup="true"
@@ -22,18 +21,13 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
-
-        <activity android:name=".PreferenceActivity"
-            android:label="@string/menuSettings"
-            />
-
-
+        <activity
+            android:name=".PreferenceActivity"
+            android:label="@string/menuSettings" />
 
         <receiver
-
             android:name=".MusicReceiver"
             android:exported="true">
             <intent-filter>
@@ -55,7 +49,6 @@
         <service android:name=".FetchLyrics" />
         <service android:name=".UpdateService" />
         <service android:name=".StopService" />
-
 
     </application>
 

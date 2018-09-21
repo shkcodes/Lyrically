@@ -7,12 +7,11 @@
     android:orientation="vertical">
 
     <ProgressBar
-        android:id="@+id/progressbar"
         style="?android:attr/progressBarStyleHorizontal"
+        android:id="@+id/progressbar"
         android:layout_width="match_parent"
         android:layout_height="8dp"
         android:indeterminateOnly="true" />
-
 
     <TextView
         android:id="@+id/title"
@@ -26,7 +25,6 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
-
     <ImageView
         android:id="@+id/refresh"
         android:layout_width="wrap_content"
@@ -35,7 +33,6 @@
         android:layout_margin="24dp"
         android:src="@drawable/refresh"
         android:visibility="gone" />
-
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
@@ -63,6 +60,4 @@
 
         </android.support.v4.widget.NestedScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
-
-
 </LinearLayout>
