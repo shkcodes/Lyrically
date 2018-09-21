@@ -1,6 +1,5 @@
 package com.shkmishra.lyrically;
 
-
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Message;
@@ -24,6 +23,5 @@ public class ShowLyrics extends IntentService {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
     }
 }

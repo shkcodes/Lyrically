@@ -56,8 +56,7 @@ public class PreferenceTrigger extends Service {
 
                 WindowManager.LayoutParams.TYPE_PHONE,
 
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                ,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
         int panelHeight = (sharedPreferences.getInt("panelHeight", 60)) * displayMetrics.heightPixels / 100;
@@ -66,19 +65,13 @@ public class PreferenceTrigger extends Service {
         lyricsPanelParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 panelHeight,
-
                 WindowManager.LayoutParams.TYPE_PHONE,
-
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-
-                ,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 PixelFormat.TRANSLUCENT);
-
 
         lyricsPanelParams.gravity = Gravity.BOTTOM;
         lyricsPanelParams.x = 0;
         lyricsPanelParams.y = 0;
-
 
         int triggerPosition = Integer.parseInt(sharedPreferences.getString("triggerPos", "1"));
         double offset = (double) (sharedPreferences.getInt("triggerOffset", 10)) / 100;
@@ -91,6 +84,7 @@ public class PreferenceTrigger extends Service {
                 triggerParams.gravity = Gravity.TOP | Gravity.END;
                 break;
         }
+
         triggerParams.x = 0;
         triggerParams.y = (int) (displayMetrics.heightPixels - (displayMetrics.heightPixels * offset));
 
@@ -100,18 +94,17 @@ public class PreferenceTrigger extends Service {
 
         trigger.setBackgroundColor(getResources().getColor(R.color.colorAccent));
 
-
         bottomLayout = layoutInflater.inflate(R.layout.lyrics_sheet, null);
-        TextView titleTV = (TextView) bottomLayout.findViewById(R.id.title);
+        TextView titleTV = bottomLayout.findViewById(R.id.title);
         titleTV.setText(getResources().getString(R.string.songTitleHint));
         titleTV.setTextColor(Color.parseColor(sharedPreferences.getString("songTitleColor", "#fd5622")));
 
         bottomLayout.findViewById(R.id.content).setBackgroundColor(Color.parseColor(sharedPreferences.getString("panelColor", "#383F47")));
 
-        ProgressBar progressBar = (ProgressBar) bottomLayout.findViewById(R.id.progressbar);
+        ProgressBar progressBar = bottomLayout.findViewById(R.id.progressbar);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(sharedPreferences.getString("songTitleColor", "#fd5622")), android.graphics.PorterDuff.Mode.SRC_IN);
 
-        TextView lyricsTV = (TextView) bottomLayout.findViewById(R.id.lyrics);
+        TextView lyricsTV = bottomLayout.findViewById(R.id.lyrics);
         lyricsTV.setText(getResources().getString(R.string.lyricsHint));
         lyricsTV.setVisibility(View.VISIBLE);
         lyricsTV.setTextColor(Color.parseColor(sharedPreferences.getString("lyricsTextColor", "#FFFFFF")));
@@ -128,12 +121,10 @@ public class PreferenceTrigger extends Service {
             public void onDismiss(View view, Object token) {
                 container.removeView(bottomLayout);
                 windowManager.removeView(container);
-
             }
         }));
 
         container = new LinearLayout(this);
-
 
         final int swipeDirection = Integer.parseInt(sharedPreferences.getString("swipeDirection", "1"));
         trigger.setOnTouchListener(new OnSwipeTouchListener(this) {
@@ -189,34 +180,28 @@ public class PreferenceTrigger extends Service {
 
         windowManager.addView(trigger, triggerParams);
 
-
         // check the onProgressChanged function in SeekBarPreference2.java
-        sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                switch (key) {
-                    case "triggerOffset":
-                        double offset = (double) (sharedPreferences.getInt("triggerOffset", 10)) / 100;
-                        triggerParams.y = (int) (displayMetrics.heightPixels - (displayMetrics.heightPixels * offset));
-                        windowManager.updateViewLayout(trigger, triggerParams);
-                        break;
+        sharedPreferenceChangeListener = (sharedPreferences, key) -> {
+            switch (key) {
+                case "triggerOffset":
+                    double offset1 = (double) (sharedPreferences.getInt("triggerOffset", 10)) / 100;
+                    triggerParams.y = (int) (displayMetrics.heightPixels - (displayMetrics.heightPixels * offset1));
+                    windowManager.updateViewLayout(trigger, triggerParams);
+                    break;
 
-                    case "triggerHeight":
-                        triggerParams.height = (sharedPreferences.getInt("triggerHeight", 10)) * 2;
-                        windowManager.updateViewLayout(trigger, triggerParams);
-                        break;
+                case "triggerHeight":
+                    triggerParams.height = (sharedPreferences.getInt("triggerHeight", 10)) * 2;
+                    windowManager.updateViewLayout(trigger, triggerParams);
+                    break;
 
-                    case "triggerWidth":
-                        triggerParams.width = (sharedPreferences.getInt("triggerWidth", 10)) * 2;
-                        windowManager.updateViewLayout(trigger, triggerParams);
-                        break;
-                }
-
+                case "triggerWidth":
+                    triggerParams.width = (sharedPreferences.getInt("triggerWidth", 10)) * 2;
+                    windowManager.updateViewLayout(trigger, triggerParams);
+                    break;
             }
         };
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
-
 
         return super.onStartCommand(intent, flags, startId);
     }

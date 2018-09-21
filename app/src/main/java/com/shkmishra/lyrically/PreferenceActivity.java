@@ -9,7 +9,6 @@ import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-
 public class PreferenceActivity extends AppCompatActivity {
 
     @Override
@@ -18,7 +17,6 @@ public class PreferenceActivity extends AppCompatActivity {
 
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
     }
 
     @Override
@@ -60,7 +58,6 @@ public class PreferenceActivity extends AppCompatActivity {
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
-
         }
 
         @Override

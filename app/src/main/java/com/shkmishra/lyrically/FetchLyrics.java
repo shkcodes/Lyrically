@@ -134,10 +134,7 @@ public class FetchLyrics extends IntentService {
             writeToFile(lyrics); // write the lyrics to a text file
 
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            noLyricsFound();
-        } catch (NullPointerException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
             noLyricsFound();
         } finally {
@@ -164,7 +161,7 @@ public class FetchLyrics extends IntentService {
         // if no lyrics were found, write the artist and song name to the No Lyrics Found.txt
         try {
             FileWriter fileWriter = new FileWriter(notFound, true);
-            fileWriter.append(artist + " | " + track + "\n");
+            fileWriter.append(artist).append(" | ").append(track).append("\n");
             fileWriter.flush();
             fileWriter.close();
         } catch (IOException e) {

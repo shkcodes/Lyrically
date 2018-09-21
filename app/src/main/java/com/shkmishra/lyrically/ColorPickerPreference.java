@@ -12,7 +12,6 @@ import android.widget.ImageView;
 
 import com.pavelsikun.vintagechroma.ChromaDialog;
 import com.pavelsikun.vintagechroma.IndicatorMode;
-import com.pavelsikun.vintagechroma.OnColorSelectedListener;
 import com.pavelsikun.vintagechroma.colormode.ColorMode;
 
 public class ColorPickerPreference extends Preference {
@@ -28,7 +27,7 @@ public class ColorPickerPreference extends Preference {
     protected void onBindView(View view) {
         super.onBindView(view);
 
-        ImageView colorPreview = (ImageView) view.findViewById(R.id.color_preview);
+        ImageView colorPreview = view.findViewById(R.id.color_preview);
         ((GradientDrawable) colorPreview.getBackground()).setColor(Color.parseColor(value));
     }
 
@@ -39,12 +38,7 @@ public class ColorPickerPreference extends Preference {
                 .initialColor(Color.parseColor(value))
                 .colorMode(ColorMode.RGB)
                 .indicatorMode(IndicatorMode.DECIMAL)
-                .onColorSelected(new OnColorSelectedListener() {
-                    @Override
-                    public void onColorSelected(int color) {
-                        setValue(String.format("#%06X", (0xFFFFFF & color)));
-                    }
-                })
+                .onColorSelected(color -> setValue(String.format("#%06X", (0xFFFFFF & color))))
                 .create().show(((AppCompatActivity) getContext()).getSupportFragmentManager(), "Color Picker");
     }
 

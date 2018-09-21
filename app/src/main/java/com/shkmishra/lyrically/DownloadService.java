@@ -12,7 +12,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.support.annotation.Nullable;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -24,7 +24,6 @@ public class DownloadService extends Service {
     int notificationID = 92790914;
     ArrayList<Song> songArrayList = new ArrayList<>();
     int progress = 1, count;
-
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, int startId) {
@@ -82,10 +81,8 @@ public class DownloadService extends Service {
                     mBuilder.setContentTitle(songArrayList.get(progress - 1).getTrack() + " - " + songArrayList.get(progress - 1).getArtist());
                     mNotifyManager.notify(notificationID, mBuilder.build());
                 }
-
             }
         };
-
 
         Messenger messenger = new Messenger(handler);
         for (Song song : songArrayList) { // fetch the lyrics for each song
@@ -98,7 +95,6 @@ public class DownloadService extends Service {
         }
         return super.onStartCommand(intent, flags, startId);
     }
-
 
     @Nullable
     @Override

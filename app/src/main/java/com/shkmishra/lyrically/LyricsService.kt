@@ -15,16 +15,19 @@ import android.os.*
 import android.preference.PreferenceManager
 import android.provider.MediaStore
 import android.provider.Settings
+import android.support.v4.app.NotificationCompat
 import android.support.v4.widget.NestedScrollView
 import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.NotificationCompat
 import android.util.DisplayMetrics
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.io.*
@@ -32,7 +35,6 @@ import java.net.URLEncoder
 import java.util.*
 
 class LyricsService : Service() {
-
 
     private lateinit var title: String
     private lateinit var lyrics: String
@@ -68,7 +70,6 @@ class LyricsService : Service() {
 
     @SuppressLint("NewApi")
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && (!Settings.canDrawOverlays(this) || checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
             Toast.makeText(this, R.string.permissions_toast, Toast.LENGTH_SHORT).show()
@@ -158,13 +159,14 @@ class LyricsService : Service() {
         titleTV = bottomLayout.findViewById(R.id.title) as TextView
         lyricsTV = bottomLayout.findViewById(R.id.lyrics) as TextView
         progressBar = bottomLayout.findViewById(R.id.progressbar) as ProgressBar
+        refresh = bottomLayout.findViewById(R.id.refresh) as ImageView
 
         lyricsTV.setTextColor(Color.parseColor(sharedPreferences.getString("lyricsTextColor", "#FFFFFF")))
         titleTV.setTextColor(Color.parseColor(sharedPreferences.getString("songTitleColor", "#fd5622")))
+        // TODO: fix "Type inference failed: Not enough information to infer parameter T in {code}. Please specify it explicitly."
         bottomLayout.findViewById(R.id.content).setBackgroundColor(Color.parseColor(sharedPreferences.getString("panelColor", "#383F47")))
         progressBar.indeterminateDrawable.setColorFilter(Color.parseColor(sharedPreferences.getString("songTitleColor", "#fd5622")), android.graphics.PorterDuff.Mode.SRC_IN)
-        refresh = bottomLayout.findViewById(R.id.refresh) as ImageView
-        val swipeRefreshLayout = bottomLayout.findViewById(R.id.swipeRefresh) as SwipeRefreshLayout
+        val swipeRefreshLayout = bottomLayout.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
             lyricsTV.text = ""

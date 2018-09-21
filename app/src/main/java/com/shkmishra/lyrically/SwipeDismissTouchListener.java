@@ -1,7 +1,6 @@
 package com.shkmishra.lyrically;
 
-// Modified the SwipeDimissTouchListener by Roman Nurik to work for vertical dismissing
-
+// Modified the SwipeDismissTouchListener by Roman Nurik to work for vertical dismissing
 
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -108,7 +107,6 @@ public class SwipeDismissTouchListener implements View.OnTouchListener {
 
                     mView.animate()
                             .translationY(0)
-
                             .setDuration(mAnimationTime)
                             .setListener(null);
                 }
@@ -177,23 +175,18 @@ public class SwipeDismissTouchListener implements View.OnTouchListener {
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
                 mView.setTranslationY(0);
                 mCallbacks.onDismiss(mView, mToken);
-
             }
 
             @Override
             public void onAnimationRepeat(Animation animation) {
-
             }
         });
-
-
     }
 
     /**

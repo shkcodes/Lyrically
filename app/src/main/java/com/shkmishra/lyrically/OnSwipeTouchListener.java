@@ -1,6 +1,5 @@
 package com.shkmishra.lyrically;
 
-
 import android.content.Context;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -43,7 +42,6 @@ public class OnSwipeTouchListener implements View.OnTouchListener {
         public boolean onDown(MotionEvent e) {
             return false;
         }
-
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {

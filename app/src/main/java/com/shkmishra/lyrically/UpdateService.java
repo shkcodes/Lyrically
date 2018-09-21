@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,10 +22,8 @@ public class UpdateService extends IntentService {
         super("UpdateService");
     }
 
-
     @Override
     protected void onHandleIntent(Intent intent) {
-
 
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -37,8 +35,7 @@ public class UpdateService extends IntentService {
 
             // show update notification if these versions mismatch
             if (!currentVersion.equals(latestVersion)) {
-                NotificationManager mNotifyManager =
-                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationManager mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
                 Intent notificationIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/shkcodes/Lyrically/releases"));
 
@@ -54,12 +51,8 @@ public class UpdateService extends IntentService {
                         mBuilder.build());
             }
 
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (IOException | PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
     }
 }
