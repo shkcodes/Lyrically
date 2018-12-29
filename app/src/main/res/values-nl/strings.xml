@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">Lyrically</string>
+    <string name="menuSettings">Instellingen</string>
+    <string name="downloadingLyrics">Bezig met ophalen van songtekst…</string>
+    <string name="lyricsDownloaded">Songtekst opgehaald</string>
+    <string name="noLyricsFound">Geen songtekst gevonden</string>
+
+
+    <string name="download">Downloaden</string>
+    <string name="downloadHelp">Songtekst downloaden voor offline gebruik</string>
+
+
+    <string name="tutorial">Rondleiding</string>
+    <string name="tutorialHelp">Leer hoe je de app gebruikt</string>
+
+
+    <string name="source">Broncode</string>
+    <string name="sourceHelp">Broncode van deze app tonen</string>
+
+
+    <string name="about">Overige apps</string>
+    <string name="aboutHelp">Bekijk ook mijn vorige apps</string>
+    <string name="songTitleHint">Artiest - Titel</string>
+    <string name="lyricsHint">Je songtekst verschijnt hier</string>
+    <string name="updateTitle">Update beschikbaar</string>
+    <string name="updateText">Druk hier om bij te werken</string>
+    <string name="draw_over_other_apps">TONEN BOVEN ANDERE APPS</string>
+    <string name="read_write_storage">LEZEN/WEGSCHRIJVEN NAAR OPSLAG</string>
+    <string name="permissions_toast">Lyrically - Verleen de benodigde machtigingen</string>
+    <string name="permissions_needed">Machtigingen vereist</string>
+    <string name="download_prompt">Songteksten ophalen voor %1$s nummers?</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nee</string>
+    <string name="please_wait">Even geduld…</string>
+    <string name="noLyricsFoundNotification">Druk hier om de nummers te tonen waar geen songtekst van kon worden gevonden</string>
+
+
+    <string name="trigger_settings_title">Trigger-instellingen</string>
+    <string name="trigger_pos_summary">De positie van het gebied waarin de veeg wordt herkend</string>
+    <string name="trigger_pos_title">Trigger-positie</string>
+    <string name="trigger_offset_summary">Trigger-uitlijning</string>
+    <string name="trigger_swipe_direction_summary">De richting waarin je veegt om de songtekst te tonen</string>
+    <string name="trigger_swipe_direction_title">Veegrichting</string>
+    <string name="trigger_width_summary">Trigger-breedte</string>
+    <string name="trigger_height_summary">Trigger-hoogte</string>
+    <string name="trigger_vibration_summary">Trillen bij trigger-detectie in- of uitschakelen</string>
+    <string name="trigger_vibration_title">Trillen</string>
+    <string name="lyrics_panel_settings_title">Instellingen van songtekstpaneel</string>
+    <string name="lyrics_panel_height_summary">Paneelhoogte</string>
+    <string name="cache_settings_title">Cache</string>
+    <string name="cache_all_summary">Alle door Lyrically getoonde songteksten opslaan in cache</string>
+    <string name="cache_all_title">Alles cachen</string>
+
+    <string name="color_settings_title">Kleurinstellingen</string>
+    <string name="color_lyrics_panel">Songtekstpaneel</string>
+    <string name="color_song_title">Titel</string>
+    <string name="color_lyrics">Songtekst</string>
+
+    <string name="update_settings_title">Updates</string>
+    <string name="check_updates_title">Controleren op updates</string>
+    <string name="check_updates_summary">Lyrically controleert één keer per week op updates</string>
+
+</resources>
