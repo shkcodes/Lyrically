@@ -520,6 +520,24 @@ class LyricsService : Service() {
 
     }
 
+    private fun fetchGoogleSearchResult(url : String) : String {
+        println("Fetching url: " + url)
+
+        var document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get()
+        var linkContainers = document.getElementsByTag("a")
+
+        for (container in linkContainers) {
+            if (container.attr("href").substring(0, 7) == "/url?q=") {
+                val result = container.attr("href").substring(7, container.attr("href").indexOf("&")) // grabbing the first result
+                println("The first result is: " + result)
+
+                return result
+            }
+        }
+
+        return ""
+    }
+
     // fetches the lyrics from the Internet
     private fun fetchLyricsAsync() {
         /*
@@ -535,18 +553,13 @@ class LyricsService : Service() {
                     title = "$artist - $track"
 
                     var url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics+azlyrics+$artistU+$trackU", "UTF-8") // Google URL
-                    var document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get()
-                    var results = document.select("h3.r > a").first()
+                    var lyricURL = fetchGoogleSearchResult(url)
 
-                    var lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&")) // grabbing the first result
                     val element: Element
                     var temp: String
-                    println(url)
-                    println(lyricURL)
-
 
                     if (lyricURL.contains("azlyrics.com/lyrics")) { // checking if from the provider we wanted
-                        document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
+                        var document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
                         var page = document.toString()
 
                         page = page.substring(page.indexOf("that. -->") + 9)
@@ -555,16 +568,11 @@ class LyricsService : Service() {
                     } else {
 
                         url = "https://www.google.com/search?q=" + URLEncoder.encode("genius+" + artistU + "+" + trackU + "lyrics", "UTF-8")
-                        document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get()
-
-                        results = document.select("h3.r > a").first()
-                        lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"))
-                        println(url)
-                        println(lyricURL)
+                        lyricURL = fetchGoogleSearchResult(url)
 
                         if (lyricURL.contains("genius")) {
 
-                            document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
+                            var document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
 
                             val selector = document.select("div.h2")
                             for (e in selector) {
@@ -576,14 +584,9 @@ class LyricsService : Service() {
                         } else {
 
                             url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics.wikia+$trackU+$artistU", "UTF-8")
-                            document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get()
+                            lyricURL = fetchGoogleSearchResult(url)
 
-                            results = document.select("h3.r > a").first()
-                            lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"))
-                            println(url)
-                            println(lyricURL)
-
-                            document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
+                            var document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
                             element = document.select("div[class=lyricbox]").first()
                             temp = element.toString()
 
