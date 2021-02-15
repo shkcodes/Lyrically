@@ -527,10 +527,27 @@ class LyricsService : Service() {
 
     }
 
+    // converts string array to url request
+    private fun stringArrayToRequest(stringArray : Array<String>) : String {
+        var request = ""
+
+        for (string in stringArray) {
+            if (!string.isEmpty()) {
+                if (stringArray.first() != string) {
+                    request += "+"
+                }
+
+                request += string
+            }
+        }
+
+        return request
+    }
+
     // fetches the first result from Google Search
-    private fun fetchGoogleSearchResult(request : String) : String {
-        val url = "https://www.google.com/search?q=" + URLEncoder.encode(request, "UTF-8")
-        println("Fetching url: " + url)
+    private fun fetchGoogleSearchResult(keywords : Array<String>) : String {
+        val url = "https://www.google.com/search?q=" + URLEncoder.encode(stringArrayToRequest(keywords), "UTF-8")
+        println("Searching for keywords in Google Search: " + keywords.joinToString())
 
         var document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get()
         var linkContainers = document.getElementsByTag("a")
@@ -550,7 +567,7 @@ class LyricsService : Service() {
     // fetches the lyrics from the Internet
     private fun fetchLyricsAsync() {
         /*
-         Currently using 3 providers : azlyrics, genius and lyrics.wikia; in that order
+         Currently using 3 providers : azlyrics, genius and songlyrics; in that order
          Procedure :
          - Google the artist + song name + provider name
          - Grab the first result and if it is from the provider we wanted, get the lyrics
@@ -566,7 +583,7 @@ class LyricsService : Service() {
                         title = "$artist - $track"
                     }
 
-                    var lyricURL = fetchGoogleSearchResult("azlyrics.com+$artistU+$trackU")
+                    var lyricURL = fetchGoogleSearchResult(arrayOf("azlyrics.com", artistU, trackU))
 
                     val element: Element
                     var temp: String
@@ -580,7 +597,7 @@ class LyricsService : Service() {
                         temp = page
                     } else {
 
-                        lyricURL = fetchGoogleSearchResult("genius.com+$artistU+$trackU")
+                        lyricURL = fetchGoogleSearchResult(arrayOf("genius.com", artistU, trackU))
 
                         if (lyricURL.contains("genius.com")) {
 
@@ -594,7 +611,7 @@ class LyricsService : Service() {
                             }
                         } else {
 
-                            lyricURL = fetchGoogleSearchResult("www.songlyrics.com+$trackU+$artistU")
+                            lyricURL = fetchGoogleSearchResult(arrayOf("www.songlyrics.com", artistU, trackU))
 
                             if (lyricURL.contains("www.songlyrics.com")) {
                                 var document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
