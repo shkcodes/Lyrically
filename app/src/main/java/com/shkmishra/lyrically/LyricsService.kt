@@ -31,6 +31,8 @@ import java.io.*
 import java.net.URLEncoder
 import java.util.*
 
+class LyricsNotFoundException(message: String): Exception(message)
+
 class LyricsService : Service() {
 
 
@@ -313,7 +315,12 @@ class LyricsService : Service() {
 
                 artist = intent.getStringExtra("artist")
                 track = intent.getStringExtra("track")
-                title = "$artist - $track"
+                // artist entry may be empty
+                if (artist.isEmpty()) {
+                    title = track
+                } else {
+                    title = "$artist - $track"
+                }
 
                 titleTV.text = title
 
@@ -552,7 +559,12 @@ class LyricsService : Service() {
             progressBar.visibility = View.VISIBLE
             val result = async(context = CommonPool, parent = asyncJob) {
                 try {
-                    title = "$artist - $track"
+                    // artist entry may be empty
+                    if (artist.isEmpty()) {
+                        title = track
+                    } else {
+                        title = "$artist - $track"
+                    }
 
                     var lyricURL = fetchGoogleSearchResult("azlyrics.com+$artistU+$trackU")
 
@@ -592,6 +604,11 @@ class LyricsService : Service() {
                                 temp = ""
                             }
                         }
+                    }
+
+                    // lyrics are not found or track is instrumental
+                    if (temp.isEmpty()) {
+                        throw LyricsNotFoundException("Lyrics are not found for track: " + title)
                     }
 
                     // preserving line breaks
