@@ -520,7 +520,9 @@ class LyricsService : Service() {
 
     }
 
-    private fun fetchGoogleSearchResult(url : String) : String {
+    // fetches the first result from Google Search
+    private fun fetchGoogleSearchResult(request : String) : String {
+        val url = "https://www.google.com/search?q=" + URLEncoder.encode(request, "UTF-8")
         println("Fetching url: " + url)
 
         var document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get()
@@ -552,8 +554,7 @@ class LyricsService : Service() {
                 try {
                     title = "$artist - $track"
 
-                    var url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics+azlyrics+$artistU+$trackU", "UTF-8") // Google URL
-                    var lyricURL = fetchGoogleSearchResult(url)
+                    var lyricURL = fetchGoogleSearchResult("lyrics+azlyrics+$artistU+$trackU")
 
                     val element: Element
                     var temp: String
@@ -567,8 +568,7 @@ class LyricsService : Service() {
                         temp = page
                     } else {
 
-                        url = "https://www.google.com/search?q=" + URLEncoder.encode("genius+" + artistU + "+" + trackU + "lyrics", "UTF-8")
-                        lyricURL = fetchGoogleSearchResult(url)
+                        lyricURL = fetchGoogleSearchResult("genius+" + artistU + "+" + trackU + "lyrics")
 
                         if (lyricURL.contains("genius")) {
 
@@ -583,8 +583,7 @@ class LyricsService : Service() {
                             temp = element.toString().substring(0, element.toString().indexOf("<!--/sse-->"))
                         } else {
 
-                            url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics.wikia+$trackU+$artistU", "UTF-8")
-                            lyricURL = fetchGoogleSearchResult(url)
+                            lyricURL = fetchGoogleSearchResult("lyrics.wikia+$trackU+$artistU")
 
                             var document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
                             element = document.select("div[class=lyricbox]").first()
