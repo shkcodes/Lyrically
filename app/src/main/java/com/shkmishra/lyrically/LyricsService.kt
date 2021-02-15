@@ -554,7 +554,7 @@ class LyricsService : Service() {
                 try {
                     title = "$artist - $track"
 
-                    var lyricURL = fetchGoogleSearchResult("lyrics+azlyrics+$artistU+$trackU")
+                    var lyricURL = fetchGoogleSearchResult("azlyrics.com+$artistU+$trackU")
 
                     val element: Element
                     var temp: String
@@ -568,27 +568,29 @@ class LyricsService : Service() {
                         temp = page
                     } else {
 
-                        lyricURL = fetchGoogleSearchResult("genius+" + artistU + "+" + trackU + "lyrics")
+                        lyricURL = fetchGoogleSearchResult("genius.com+$artistU+$trackU")
 
-                        if (lyricURL.contains("genius")) {
+                        if (lyricURL.contains("genius.com")) {
 
-                            var document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
+                            var document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0").timeout(10000).get() // USER_AGENT doesn't work, returns code 503
+                            val elements = document.select("div[class^=\"Lyrics__Container\"]")
 
-                            val selector = document.select("div.h2")
-                            for (e in selector) {
-                                e.remove()
+                            if (elements.size > 0) {
+                                temp = elements.first().toString()
+                            } else {
+                                temp = elements.toString()
                             }
-
-                            element = document.select("div[class=song_body-lyrics]").first()
-                            temp = element.toString().substring(0, element.toString().indexOf("<!--/sse-->"))
                         } else {
 
-                            lyricURL = fetchGoogleSearchResult("lyrics.wikia+$trackU+$artistU")
+                            lyricURL = fetchGoogleSearchResult("www.songlyrics.com+$trackU+$artistU")
 
-                            var document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
-                            element = document.select("div[class=lyricbox]").first()
-                            temp = element.toString()
-
+                            if (lyricURL.contains("www.songlyrics.com")) {
+                                var document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
+                                element = document.select("div[id=songLyricsDiv-outer]").first()
+                                temp = element.toString()
+                            } else {
+                                temp = ""
+                            }
                         }
                     }
 
@@ -601,8 +603,6 @@ class LyricsService : Service() {
                     lyrics = lyrics.replace("br2n".toRegex(), "\n")
                     lyrics = lyrics.replace("]shk".toRegex(), "]\n")
                     lyrics = lyrics.replace("shk\\[".toRegex(), "\n [")
-                    if (lyricURL.contains("genius"))
-                        lyrics = lyrics.substring(lyrics.indexOf("Lyrics") + 6)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     return@async null
