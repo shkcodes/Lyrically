@@ -549,8 +549,8 @@ class LyricsService : Service() {
         val url = "https://www.google.com/search?q=" + URLEncoder.encode(stringArrayToRequest(keywords), "UTF-8")
         println("Searching for keywords in Google Search: " + keywords.joinToString())
 
-        var document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get()
-        var linkContainers = document.getElementsByTag("a")
+        val document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get()
+        val linkContainers = document.getElementsByTag("a")
 
         for (container in linkContainers) {
             if (container.attr("href").substring(0, 7) == "/url?q=") {
@@ -559,6 +559,50 @@ class LyricsService : Service() {
 
                 return result
             }
+        }
+
+        return ""
+    }
+
+    private fun fetchLyricsFromAZLyrics() : String {
+        val lyricURL = fetchGoogleSearchResult(arrayOf("azlyrics.com", artistU, trackU))
+
+        if (lyricURL.contains("azlyrics.com/lyrics")) {
+            val document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
+            var page = document.toString()
+
+            page = page.substring(page.indexOf("that. -->") + 9)
+            page = page.substring(0, page.indexOf("</div>"))
+
+            return page
+        }
+
+        return ""
+    }
+
+    private fun fetchLyricsFromGenius() : String {
+        val lyricURL = fetchGoogleSearchResult(arrayOf("genius.com", artistU, trackU))
+
+        if (lyricURL.contains("genius.com")) {
+            val document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0").timeout(10000).get() // USER_AGENT doesn't work, returns code 503
+            val elements = document.select("div[class^=\"Lyrics__Container\"]")
+
+            if (elements.size > 0) {
+                return elements.first().toString()
+            } else {
+                return elements.toString()
+            }
+        }
+
+        return ""
+    }
+
+    private fun fetchLyricsFromSonglyrics() : String {
+        val lyricURL = fetchGoogleSearchResult(arrayOf("www.songlyrics.com", artistU, trackU))
+
+        if (lyricURL.contains("www.songlyrics.com")) {
+            val document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
+            return document.select("div[id=songLyricsDiv-outer]").first().toString()
         }
 
         return ""
@@ -583,43 +627,18 @@ class LyricsService : Service() {
                         title = "$artist - $track"
                     }
 
-                    var lyricURL = fetchGoogleSearchResult(arrayOf("azlyrics.com", artistU, trackU))
+                    var temp = ""
+                    val fetchFunctions = arrayOf(
+                            ::fetchLyricsFromAZLyrics,
+                            ::fetchLyricsFromGenius,
+                            ::fetchLyricsFromSonglyrics)
 
-                    val element: Element
-                    var temp: String
-
-                    if (lyricURL.contains("azlyrics.com/lyrics")) { // checking if from the provider we wanted
-                        var document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
-                        var page = document.toString()
-
-                        page = page.substring(page.indexOf("that. -->") + 9)
-                        page = page.substring(0, page.indexOf("</div>"))
-                        temp = page
-                    } else {
-
-                        lyricURL = fetchGoogleSearchResult(arrayOf("genius.com", artistU, trackU))
-
-                        if (lyricURL.contains("genius.com")) {
-
-                            var document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0").timeout(10000).get() // USER_AGENT doesn't work, returns code 503
-                            val elements = document.select("div[class^=\"Lyrics__Container\"]")
-
-                            if (elements.size > 0) {
-                                temp = elements.first().toString()
-                            } else {
-                                temp = elements.toString()
-                            }
-                        } else {
-
-                            lyricURL = fetchGoogleSearchResult(arrayOf("www.songlyrics.com", artistU, trackU))
-
-                            if (lyricURL.contains("www.songlyrics.com")) {
-                                var document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
-                                element = document.select("div[id=songLyricsDiv-outer]").first()
-                                temp = element.toString()
-                            } else {
-                                temp = ""
-                            }
+                    for (function in fetchFunctions) {
+                        val result = function()
+                        
+                        if (!result.isEmpty()) {
+                            temp = result
+                            break
                         }
                     }
 
