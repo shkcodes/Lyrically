@@ -31,6 +31,8 @@ import java.io.*
 import java.net.URLEncoder
 import java.util.*
 
+class LyricsNotFoundException(message: String): Exception(message)
+
 class LyricsService : Service() {
 
 
@@ -313,7 +315,12 @@ class LyricsService : Service() {
 
                 artist = intent.getStringExtra("artist")
                 track = intent.getStringExtra("track")
-                title = "$artist - $track"
+                // artist entry may be empty
+                if (artist.isEmpty()) {
+                    title = track
+                } else {
+                    title = "$artist - $track"
+                }
 
                 titleTV.text = title
 
@@ -520,10 +527,91 @@ class LyricsService : Service() {
 
     }
 
+    // converts string array to url request
+    private fun stringArrayToRequest(stringArray : Array<String>) : String {
+        var request = ""
+
+        for (string in stringArray) {
+            if (!string.isEmpty()) {
+                if (stringArray.first() != string) {
+                    request += "+"
+                }
+
+                request += string
+            }
+        }
+
+        return request
+    }
+
+    // fetches the first result from Google Search
+    private fun fetchGoogleSearchResult(keywords : Array<String>) : String {
+        val url = "https://www.google.com/search?q=" + URLEncoder.encode(stringArrayToRequest(keywords), "UTF-8")
+        println("Searching for keywords in Google Search: " + keywords.joinToString())
+
+        val document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get()
+        val linkContainers = document.getElementsByTag("a")
+
+        for (container in linkContainers) {
+            if (container.attr("href").substring(0, 7) == "/url?q=") {
+                val result = container.attr("href").substring(7, container.attr("href").indexOf("&")) // grabbing the first result
+                println("The first result is: " + result)
+
+                return result
+            }
+        }
+
+        return ""
+    }
+
+    private fun fetchLyricsFromAZLyrics() : String {
+        val lyricURL = fetchGoogleSearchResult(arrayOf("azlyrics.com", artistU, trackU))
+
+        if (lyricURL.contains("azlyrics.com/lyrics")) {
+            val document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
+            var page = document.toString()
+
+            page = page.substring(page.indexOf("that. -->") + 9)
+            page = page.substring(0, page.indexOf("</div>"))
+
+            return page
+        }
+
+        return ""
+    }
+
+    private fun fetchLyricsFromGenius() : String {
+        val lyricURL = fetchGoogleSearchResult(arrayOf("genius.com", artistU, trackU))
+
+        if (lyricURL.contains("genius.com")) {
+            val document = Jsoup.connect(lyricURL).userAgent("Mozilla/5.0").timeout(10000).get() // USER_AGENT doesn't work, returns code 503
+            val elements = document.select("div[class^=\"Lyrics__Container\"]")
+
+            if (elements.size > 0) {
+                return elements.first().toString()
+            } else {
+                return elements.toString()
+            }
+        }
+
+        return ""
+    }
+
+    private fun fetchLyricsFromSonglyrics() : String {
+        val lyricURL = fetchGoogleSearchResult(arrayOf("www.songlyrics.com", artistU, trackU))
+
+        if (lyricURL.contains("www.songlyrics.com")) {
+            val document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
+            return document.select("div[id=songLyricsDiv-outer]").first().toString()
+        }
+
+        return ""
+    }
+
     // fetches the lyrics from the Internet
     private fun fetchLyricsAsync() {
         /*
-         Currently using 3 providers : azlyrics, genius and lyrics.wikia; in that order
+         Currently using 3 providers : azlyrics, genius and songlyrics; in that order
          Procedure :
          - Google the artist + song name + provider name
          - Grab the first result and if it is from the provider we wanted, get the lyrics
@@ -532,62 +620,31 @@ class LyricsService : Service() {
             progressBar.visibility = View.VISIBLE
             val result = async(context = CommonPool, parent = asyncJob) {
                 try {
-                    title = "$artist - $track"
-
-                    var url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics+azlyrics+$artistU+$trackU", "UTF-8") // Google URL
-                    var document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get()
-                    var results = document.select("h3.r > a").first()
-
-                    var lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&")) // grabbing the first result
-                    val element: Element
-                    var temp: String
-                    println(url)
-                    println(lyricURL)
-
-
-                    if (lyricURL.contains("azlyrics.com/lyrics")) { // checking if from the provider we wanted
-                        document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
-                        var page = document.toString()
-
-                        page = page.substring(page.indexOf("that. -->") + 9)
-                        page = page.substring(0, page.indexOf("</div>"))
-                        temp = page
+                    // artist entry may be empty
+                    if (artist.isEmpty()) {
+                        title = track
                     } else {
+                        title = "$artist - $track"
+                    }
 
-                        url = "https://www.google.com/search?q=" + URLEncoder.encode("genius+" + artistU + "+" + trackU + "lyrics", "UTF-8")
-                        document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get()
+                    var temp = ""
+                    val fetchFunctions = arrayOf(
+                            ::fetchLyricsFromAZLyrics,
+                            ::fetchLyricsFromGenius,
+                            ::fetchLyricsFromSonglyrics)
 
-                        results = document.select("h3.r > a").first()
-                        lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"))
-                        println(url)
-                        println(lyricURL)
-
-                        if (lyricURL.contains("genius")) {
-
-                            document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
-
-                            val selector = document.select("div.h2")
-                            for (e in selector) {
-                                e.remove()
-                            }
-
-                            element = document.select("div[class=song_body-lyrics]").first()
-                            temp = element.toString().substring(0, element.toString().indexOf("<!--/sse-->"))
-                        } else {
-
-                            url = "https://www.google.com/search?q=" + URLEncoder.encode("lyrics.wikia+$trackU+$artistU", "UTF-8")
-                            document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(10000).get()
-
-                            results = document.select("h3.r > a").first()
-                            lyricURL = results.attr("href").substring(7, results.attr("href").indexOf("&"))
-                            println(url)
-                            println(lyricURL)
-
-                            document = Jsoup.connect(lyricURL).userAgent(USER_AGENT).get()
-                            element = document.select("div[class=lyricbox]").first()
-                            temp = element.toString()
-
+                    for (function in fetchFunctions) {
+                        val result = function()
+                        
+                        if (!result.isEmpty()) {
+                            temp = result
+                            break
                         }
+                    }
+
+                    // lyrics are not found or track is instrumental
+                    if (temp.isEmpty()) {
+                        throw LyricsNotFoundException("Lyrics are not found for track: " + title)
                     }
 
                     // preserving line breaks
@@ -599,8 +656,6 @@ class LyricsService : Service() {
                     lyrics = lyrics.replace("br2n".toRegex(), "\n")
                     lyrics = lyrics.replace("]shk".toRegex(), "]\n")
                     lyrics = lyrics.replace("shk\\[".toRegex(), "\n [")
-                    if (lyricURL.contains("genius"))
-                        lyrics = lyrics.substring(lyrics.indexOf("Lyrics") + 6)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     return@async null
